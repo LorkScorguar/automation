@@ -7,6 +7,7 @@ Avoid the usage of Dynamic Device Group
 import sys
 sys.path.append('/opt/opsware/pylibs2')
 from pytwist import *
+import getpass
 
 def usage():
     msg="""Usage: ./Twist_updateDG.py [deviceGroupRef] [rule]
@@ -55,8 +56,8 @@ if __name__ == '__main__':
             global dgService
             global serverService
             ts=twistserver.TwistServer()
-            user=input("Enter SA username:")
-            passw=input("Enter password for "+user+": ")
+            user=raw_input("Enter SA username:")
+            passw=getpass.getpass("Enter password for "+user+": ")
             ts.authenticate(user,passw)
             dgService=ts.device.DeviceGroupService
             serverService=ts.server.ServerService
