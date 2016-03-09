@@ -8,14 +8,6 @@ import sys
 sys.path.append('/opt/opsware/pylibs2')
 from pytwist import *
 
-
-s=twistserver.TwistServer()
-dgService=ts.device.DeviceGroupService
-serverService=ts.server.ServerService
-global ts
-global dgService
-global serverService
-
 def usage():
     msg="""Usage: ./Twist_updateDG.py [deviceGroupRef] [rule]
     -h, --help          Display this help
@@ -27,13 +19,15 @@ def usage():
 
 def getDGContent(dgRef):
     dgContent=[]
-    dgContent=dgRef.getDevices()
+    dgContent=dgService.getDevices(dgRef)
     return dgContent
 
 def getNewContent(rule):
     newDGContent=[]
     filterDvc=com.opsware.search.Filter()
     filterDvc.expression = rule
+    #filterDvc.expression = 'ServerVO.osVersion contains Linux'
+    filterDvc.objectType = 'device'
     newDGContent=serverService.findServerRef(filterDvc)
     return newDGContent
 
@@ -48,14 +42,26 @@ def modifyDG(dgRef,rule):
     for dvc in dgContent:
         if dvc not in newDGContent:
             toRemove.append(dvc)
-    dgRef.removeDevices(toRemove)
-    dgRef.addDevices(toAdd)
+    dgService.removeDevices(dgRef,toRemove)
+    dgService.addDevices(dgRef,toAdd)
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == "-help" or sys.argv[1] == "-h" or len(sys.argv)>2:
-        usage()
+    if len(sys.argv)!=2:
+        if sys.argv[1] == "-help" or sys.argv[1] == "-h":
+            usage()
+        else:
+            global ts
+            global dgService
+            global serverService
+            ts=twistserver.TwistServer()
+            user=input("Enter SA username:")
+            passw=input("Enter password for "+user+": ")
+            ts.authenticate(user,passw)
+            dgService=ts.device.DeviceGroupService
+            serverService=ts.server.ServerService
+            dgRef=com.opsware.device.DeviceGroupRef(sys.argv[1])
+            rule=sys.argv[2]
+            modifyDG(dgRef,rule)
     else:
-        dgRef=sys.argv[1]
-        rule=sys.argv[2]
-        modifyDG(dgRef,rule)
+        usage()
