@@ -1,3 +1,18 @@
+"""
+A simple script to show what can we do with OO 10 API
+It allows you to:
+- get OO version
+- verify Content Pack version between multiple Centrals
+- verify System Properties and System Account values in Central if they should be override
+- purge OO database
+- get OO database statistics
+- get audit records
+- launch flow
+- get monthly statistics for flows
+
+written by Florent Pied
+"""
+
 import json
 import urllib.request
 import base64
@@ -214,8 +229,8 @@ def generateDefaultSP(authValue):#generate System Properties value list
     file=open("spDev.json","w")
     json.dump(allSPValue,file)
     file.close()
-   
-    
+
+
 def verifySPDEV(authValue):#Check if all System Properties value are equal to the default value
     global centrals
     oodev=centrals[0].split(";")[1]
@@ -288,7 +303,7 @@ def verifyCP(authValue):#check if all CP have the same version in DEV, HOMO and 
                     if k==k2==k3:
                         if v!=v2 or v!=v3 or v2!=v3:
                             print(k+" version is different DEV("+v+") HOMO("+v2+") PROD("+v3+")")
-            
+
 def run():
     authValue=auth()
     choice=input("What do you want?\n1-Verify Content Pack version\n2-Verify System Properties\n3-Get OO Version\n4-Purge Database\n5-Get Database Stats\n6-Get Audit Records\n7-Launch Flow\n8-Get Monthly Flows\n>")
