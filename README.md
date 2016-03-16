@@ -1,5 +1,6 @@
-# automation
-Some scripts written for HP SA and HP OO
+# Automation
+Some scripts written for HP SA (Server Automation) and HP OO (Operations Orchestration)
+Those scripts were tested on HP SA 10.0x and HP OO 10.2x and 10.5x
 
 # Spin
 The Spin is a low level API to manipulate objects, usefull to debug or solve conflicts in HPSA
