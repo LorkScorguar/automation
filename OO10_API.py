@@ -304,9 +304,32 @@ def verifyCP(authValue):#check if all CP have the same version in DEV, HOMO and 
                         if v!=v2 or v!=v3 or v2!=v3:
                             print(k+" version is different DEV("+v+") HOMO("+v2+") PROD("+v3+")")
 
+def cancelPausedFlows(authValue,oourl):
+    result=""
+    req=urllib.request.Request(oourl+"executions?status=PAUSED")
+    req.add_header("content-type", "application/json")
+    req.add_header("Authorization", authValue)
+    context=ignoreCertificate()
+    resp=urllib.request.urlopen(req,context=context)
+    jResp=json.loads(resp.read().decode('utf-8'))
+    if len(jResp)==0:
+        result="No Paused flows"
+    else:
+        for flow in jResp:
+            eid=flow['executionId']
+            #print(eid)
+            flow={"action":"CANCEL"}
+            req=urllib.request.Request(oourl+"executions/"+eid+"/status",method='PUT')
+            req.add_header("content-type", "application/json")
+            req.add_header("Authorization", authValue)
+            context=ignoreCertificate()
+            resp=urllib.request.urlopen(req,json.dumps(flow).encode('utf-8'),context=context)
+        result="Cancelled "+str(len(jResp))+" flows"
+    return result
+
 def run():
     authValue=auth()
-    choice=input("What do you want?\n1-Verify Content Pack version\n2-Verify System Properties\n3-Get OO Version\n4-Purge Database\n5-Get Database Stats\n6-Get Audit Records\n7-Launch Flow\n8-Get Monthly Flows\n>")
+    choice=input("What do you want?\n1-Verify Content Pack version\n2-Verify System Properties\n3-Get OO Version\n4-Purge Database\n5-Get Database Stats\n6-Get Audit Records\n7-Launch Flow\n8-Get Monthly Flows\n9-Cancel Paused flows\n>")
     result=""
     if choice=="1":
         verifyCP(authValue)
@@ -367,6 +390,9 @@ def run():
         central=chooseCentral()
         month=int(input("Enter month[1-12]: "))
         getStats(authValue,central,month)
+    elif choice=="9":
+        central=chooseCentral()
+        result=cancelPausedFlows(authValue,central)
     else:
             result="I don't understand"
     print(result)
