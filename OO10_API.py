@@ -9,6 +9,7 @@ It allows you to:
 - get audit records
 - launch flow
 - get monthly statistics for flows
+- cancel all paused flows
 
 written by Florent Pied
 """
