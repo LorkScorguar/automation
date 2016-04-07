@@ -177,7 +177,6 @@ def getStatsForFlow(authValue,oourl,flowUUID,ts,month):
         resp=urllib.request.urlopen(req,context=context)
         jResp=json.loads(resp.read().decode('utf-8'))
         nb=len(jResp)
-        nbFlow+=nb
         i+=1
         duration=datetime.timedelta(0)
         medium=datetime.timedelta(0)
@@ -193,8 +192,12 @@ def getStatsForFlow(authValue,oourl,flowUUID,ts,month):
                 n=item['flowPath'].split("/")
                 name=n[len(n)-1][:-4]
                 file.write(name+";"+str(item['executionId'])+";"+str(duration.seconds)+"\n")
-            medium=medium/len(jResp)
-        medium=medium.seconds*0.0166
+	        nbFlow+=1
+	try:
+        	medium=medium/nbFlow
+        	medium=medium.seconds*0.0166
+	except:
+		medium=0
     file.close()
     return nbFlow,duration
 
