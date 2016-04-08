@@ -163,7 +163,7 @@ def launchFlow(authValue,oourl,flowID,inputs,runName):
     print(jResp)
     return 'ok'
 
-def getStatsForFlow(authValue,oourl,flowUUID,ts,month):
+def getStatsForFlow(authValue,oourl,flowUUID,ts,tsEnd,month):
     nbFlow=0
     nb=1000
     duration=0
@@ -187,12 +187,12 @@ def getStatsForFlow(authValue,oourl,flowUUID,ts,month):
                     start=datetime.datetime.fromtimestamp(int(str(item['startTime'])[:-3]))
                     duration=(end-start)
                     medium+=(end-start)
+                    n=item['flowPath'].split("/")
+                    name=n[len(n)-1][:-4]
+                    file.write(name+";"+str(item['executionId'])+";"+str(duration.seconds)+"\n")
+	            nbFlow+=1
                 except:
                     continue
-                n=item['flowPath'].split("/")
-                name=n[len(n)-1][:-4]
-                file.write(name+";"+str(item['executionId'])+";"+str(duration.seconds)+"\n")
-	        nbFlow+=1
 	try:
         	medium=medium/nbFlow
         	medium=medium.seconds*0.0166
@@ -207,10 +207,13 @@ def getStats(authValue,oourl,month):
     duration=0
     timestamp=(datetime.datetime(2016,int(month),1)-datetime.datetime(1970,1,1))/datetime.timedelta(seconds=1)
     ts=math.floor(timestamp)*1000
-    nbFlows,duration=getStatsForFlow(authValue,oourl,"",ts)
+    endDay=calendar.monthrange(2016,int(month))
+    timestampEnd=(datetime.datetime(2016,int(month),endDay[1])-datetime.datetime(1970,1,1))/datetime.timedelta(seconds=1)
+    tsEnd=math.floor(timestampEnd)*1000
+    nbFlows,duration=getStatsForFlow(authValue,oourl,"",ts,tsEnd,month)
     print(str(nbFlows)+" flows were launched this month, duration is about "+str(duration))
     for k,v in dflows.items():
-        nbFlows,duration=getStatsForFlow(authValue,oourl,v,ts,month)
+        nbFlows,duration=getStatsForFlow(authValue,oourl,v,ts,tsEnd,month)
         print(str(nbFlows)+" "+str(k)+" flows were launched this month, duration is about "+str(duration)+" minutes")
     return 'ok'
 
