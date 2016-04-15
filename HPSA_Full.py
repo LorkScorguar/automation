@@ -39,7 +39,7 @@ spin=spinwrapper.SpinWrapper(ctx=ctx)
 def usage():
 	msg="""Usage: ./HPSA_Full.py
 	-h, --help:	Display this help
-	
+
 	This tool create a hpsa_report.html file that contain informations about your HP SA infrastructure
 	"""
 	print(msg)
