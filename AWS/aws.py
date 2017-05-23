@@ -15,7 +15,7 @@ Must do the following:
 + list all RDS db
 
 - ALL
-- Get Trusted Advisor infos
++ Get Trusted Advisor infos
 
 - OTHER
 + Generate list of AWS instance type with description
