@@ -91,7 +91,6 @@ def getUserInstances(user):
     print("Found "+str(nb)+" instances")
 
 def listInstances():
-    global verbose
     nb = 0
     for instance in ec2r.instances.all():
         if verbose:
@@ -127,7 +126,14 @@ def listElb():
     res = []
     delb = elbc.describe_load_balancers()
     for elb in delb['LoadBalancerDescriptions']:
-        res.append(elb['LoadBalancerName'])
+        if verbose:
+            instances = ""
+            for instance in elb['Instances']:
+                instances += ","+instance['InstanceId']
+            instances = instances[1:]
+            res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets'])+";"+','.join(elb['AvailabilityZones'])+";"+instances)
+        else:
+            res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets']))
     return res
 
 #ELB
@@ -135,7 +141,10 @@ def listRds():
     res = []
     drds = rdsc.describe_db_instances()
     for rds in drds['DBInstances']:
-        res.append(rds['DBInstanceIdentifier'])
+        if verbose:
+            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+rds['DBInstanceStatus']+";"+rds['EngineVersion']+";"+rds['DBSubnetGroup']['DBSubnetGroupName'])
+        else:
+            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+rds['DBInstanceStatus'])
     return res
 
 #ALL
