@@ -16,12 +16,12 @@ Some scripts to play around HP Server Automation and HP Operations Orchestration
 
 ## Spin
 The Spin is a low level API to manipulate objects, usefull to debug or solve conflicts in HPSA
-Spin is available by web on https://<coreIP>:1004 (you need the spin-developper certificate)
+Spin is available by web on https://< coreIP >:1004 (you need the spin-developper certificate)
 
 ## Twist
 Twist is a component that give access to a powerfull API in java, python and C#
 When you want to do something in SA with script check it.
-Twist is available by web on https://<coreIP>:1032
+Twist is available by web on https://< coreIP >:1032
 
 # Network
 Some scripts to play with network equipments and automate them
