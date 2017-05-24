@@ -14,12 +14,10 @@ Must do the following:
 - ELB
 + list all ELB
 - Get Idle ELB
-- Stop/Start ELB
 
 - RDS
 + list all RDS instance
 - Get Idle RDS
-- Stop/Start instance
 
 - ALL
 + Get Trusted Advisor infos
@@ -88,6 +86,45 @@ def getAdvise(verbose):
                         else:
                             print(k+":"+k1+":"+it['name'])
     return "You can save up to "+str(totalSavings)+"$"
+
+def getIdleRDS(verbose):
+    """Get list of Idle RDS instances"""
+    lrds = []
+    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
+    for it in jResp['checks']:
+        if it['category'] == 'cost_optimizing' and it['name'] == 'Amazon RDS Idle DB Instances':
+            jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
+                                                                    language="en")
+            totalSavings = str(jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings'])
+            for rds in jResp2['result']['flaggedResources']:
+                if '14+' in rds['metadata']:
+                    if verbose:
+                        lrds.append(rds['resourceId']+";"+','.join(rds['metadata']))
+                    else:
+                        lrds.append(rds['resourceId'])
+    print("You can save up to "+totalSavings)
+    return lrds
+
+def getIdleELB(verbose):
+    """Get list of Idle ELB"""
+    lelb = []
+    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
+    for it in jResp['checks']:
+        if it['category'] == 'cost_optimizing' and it['name'] == 'Idle Load Balancers':
+            jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
+                                                                    language="en")
+            totalSavings = str(jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings'])
+            for elb in jResp2['result']['flaggedResources']:
+                if 'No active back-end instances' in elb['metadata']:
+                    if verbose:
+                        lelb.append(elb['resourceId']+";"+','.join(elb['metadata']))
+                    else:
+                        lelb.append(elb['resourceId'])
+    print("You can save up to "+totalSavings)
+    return lelb
+
+lelb=getIdleELB(False)
+print(len(lelb))
 
 #OTHER
 def ignoreCertificate():
