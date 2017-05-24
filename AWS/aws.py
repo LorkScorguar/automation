@@ -99,9 +99,9 @@ def getIdleRDS(verbose):
             for rds in jResp2['result']['flaggedResources']:
                 if '14+' in rds['metadata']:
                     if verbose:
-                        lrds.append(rds['resourceId']+";"+','.join(rds['metadata']))
+                        lrds.append(';'.join(rds['metadata']))
                     else:
-                        lrds.append(rds['resourceId'])
+                        lrds.append(rds['metadata'][1])
     print("You can save up to "+totalSavings)
     return lrds
 
@@ -117,14 +117,14 @@ def getIdleELB(verbose):
             for elb in jResp2['result']['flaggedResources']:
                 if 'No active back-end instances' in elb['metadata']:
                     if verbose:
-                        lelb.append(elb['resourceId']+";"+','.join(elb['metadata']))
+                        lelb.append(';'.join(elb['metadata']))
                     else:
-                        lelb.append(elb['resourceId'])
+                        lelb.append(elb['metadata'][1])
     print("You can save up to "+totalSavings)
     return lelb
 
 lelb=getIdleELB(False)
-print(len(lelb))
+print(lelb)
 
 #OTHER
 def ignoreCertificate():
