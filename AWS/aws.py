@@ -35,23 +35,28 @@ import secret
 os.environ["HTTP_PROXY"] = secret.getProxy()
 os.environ["HTTPS_PROXY"] = secret.getProxy()
 
-access_key_id, secret_access_key = secret.getAccess()
-region = secret.getRegion()
+ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
+REGION = secret.getRegion()
 
-ec2r = boto3.resource(service_name='ec2', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name=region)
-ec2c = boto3.client(service_name='ec2', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name=region)
+EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
+                      aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
+EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
+                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 
-rdsc = boto3.client(service_name='rds', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name=region)
+RDSC = boto3.client(service_name='rds', aws_access_key_id=ACCESS_KEY_ID,
+                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 
-elbc = boto3.client(service_name='elb', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name=region)
+ELBC = boto3.client(service_name='elb', aws_access_key_id=ACCESS_KEY_ID,
+                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 
-supportc = boto3.client(service_name='support', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name="us-east-1")
+SUPPORTC = boto3.client(service_name='support', aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY, region_name="us-east-1")
 
 #EC2 Volumes
 def getOldUnusedVols():
     """Get List of volumes that are available and 30 days old at least"""
     res = []
-    ec2volumes = ec2c.describe_volumes(Filters=[
+    ec2volumes = EC2C.describe_volumes(Filters=[
         {
             'Name': 'status',
             'Values': [
@@ -71,11 +76,12 @@ def getOldUnusedVols():
 def getUserInstances(user):
     """Count number of instances for specific user"""
     nb = 0
-    instances = ec2r.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
+    instances = EC2R.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
     for instance in instances:
         nb += 1
-        if verbose:
-            server = str(instance.id)+";"+str(instance.instance_type)+";"+str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
+        if VERBOSE:
+            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
+                     str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
             try:
                 for tag in instance.tags:
                     if tag['Key'] == 'Description':
@@ -87,16 +93,18 @@ def getUserInstances(user):
             except:
                 continue
         else:
-            server = str(instance.id)+";"+str(instance.instance_type)+";"+str(instance.state['Name'])
+            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
+                     str(instance.state['Name'])
         print(server)
     print("Found "+str(nb)+" instances")
 
 def listInstances():
     """list all ec2 instances"""
     nb = 0
-    for instance in ec2r.instances.all():
-        if verbose:
-            server = str(instance.id)+":"+str(instance.instance_type)+","+str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
+    for instance in EC2R.instances.all():
+        if VERBOSE:
+            server = str(instance.id)+":"+str(instance.instance_type)+","+\
+                     str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
             nb += 1
             try:
                 for tag in instance.tags:
@@ -109,14 +117,15 @@ def listInstances():
             except:
                 continue
         else:
-            server = str(instance.id)+":"+str(instance.instance_type)+","+str(instance.state['Name'])
+            server = str(instance.id)+":"+str(instance.instance_type)+","+\
+                     str(instance.state['Name'])
         print(server)
     print("Found "+str(nb)+" instances")
 
 def countInstanceByType():
     """Count instances by flavors"""
     instancesByType = {}
-    for instance in ec2r.instances.all():
+    for instance in EC2R.instances.all():
         try:
             instancesByType[instance.instance_type] += 1
         except:
@@ -128,14 +137,15 @@ def countInstanceByType():
 def listElb():
     """List all ELB"""
     res = []
-    delb = elbc.describe_load_balancers()
+    delb = ELBC.describe_load_balancers()
     for elb in delb['LoadBalancerDescriptions']:
-        if verbose:
+        if VERBOSE:
             instances = ""
             for instance in elb['Instances']:
                 instances += ","+instance['InstanceId']
             instances = instances[1:]
-            res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets'])+";"+','.join(elb['AvailabilityZones'])+";"+instances)
+            res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets'])+\
+                       ";"+','.join(elb['AvailabilityZones'])+";"+instances)
         else:
             res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets']))
     return res
@@ -144,12 +154,15 @@ def listElb():
 def listRds():
     """List all RDS instances"""
     res = []
-    drds = rdsc.describe_db_instances()
+    drds = RDSC.describe_db_instances()
     for rds in drds['DBInstances']:
-        if verbose:
-            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+rds['DBInstanceStatus']+";"+rds['EngineVersion']+";"+rds['DBSubnetGroup']['DBSubnetGroupName'])
+        if VERBOSE:
+            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+\
+                       rds['DBInstanceStatus']+";"+rds['EngineVersion']+";"+\
+                       rds['DBSubnetGroup']['DBSubnetGroupName'])
         else:
-            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+rds['DBInstanceStatus'])
+            res.append(rds['DBInstanceIdentifier']+";"+rds['Engine']+";"+\
+                       rds['DBInstanceStatus'])
     return res
 
 #ALL
@@ -158,11 +171,13 @@ def getAdvise():
     totalSavings = 0
     dreport = {}
     dcategory = {}
-    jResp = supportc.describe_trusted_advisor_checks(language="en")
+    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
     for check in jResp["checks"]:
-        jResp2 = supportc.describe_trusted_advisor_check_result(checkId=str(check['id']), language="en")
+        jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(check['id']),
+                                                                language="en")
         if 'categorySpecificSummary' in jResp2['result'] and 'costOptimizing' in jResp2['result']['categorySpecificSummary']:
-            ditem = {'id':check['id'], 'name':check['name'], 'savings':jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings']}
+            ditem = {'id':check['id'], 'name':check['name'],
+                     'savings':jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings']}
             totalSavings += jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings']
         else:
             ditem = {'id':check['id'], 'name':check['name']}
@@ -171,7 +186,7 @@ def getAdvise():
         except:
             dcategory[jResp2['result']['status']] = [ditem]
         dreport[check['category']] = dcategory
-    if verbose:
+    if VERBOSE:
         for k, v in dreport.items():
             for k1, v1 in v.items():
                 for it in v1:
@@ -202,12 +217,20 @@ def getInstanceTypes():
     """Parse AWS website to list all instance flavors"""
     dflavors = {}
     #m3.medium -- 1 vCPU, 3.75 GiB RAM -- General purpose
-    desc = {"t":"General Purpose", "m":"General Purpose", "c":"Compute Optimized", "x":"Memory Optimized", "r":"Memory Optimized", "p":"GPU Compute", "g":"GPU Instances", "f":"FPGA Instances", "i":"Storage Optimized", "d":"Storage Optimized"}
+    desc = {"t":"General Purpose",
+            "m":"General Purpose",
+            "c":"Compute Optimized",
+            "x":"Memory Optimized",
+            "r":"Memory Optimized",
+            "p":"GPU Compute",
+            "g":"GPU Instances",
+            "f":"FPGA Instances",
+            "i":"Storage Optimized",
+            "d":"Storage Optimized"}
     url = "https://aws.amazon.com/ec2/instance-types/"
     req = urllib.request.Request(url)
     req.get_method = lambda: 'GET'
-    context = ignoreCertificate()
-    resp = urllib.request.urlopen(req, context=context)
+    resp = urllib.request.urlopen(req, context=ignoreCertificate())
     data = resp.read().decode('utf-8')
     data = data.split("<h2 id=\"instance-type-matrix\">")[1]
     data = data.split("""</table>
@@ -227,52 +250,62 @@ def getInstanceTypes():
             arr = item.split("</td>")
             mem = re.compile("<td.*>").split(arr[2])[1].strip()
             cpu = re.compile("<td.*>").split(arr[1])[1].strip()
-            description = desc[name[0]]
-            dflavors[name.replace(".", "_")] = str(name)+" -- "+str(cpu)+" vCPU, "+str(mem)+" GiB RAM -- "+description
+            dflavors[name.replace(".", "_")] = str(name)+" -- "+str(cpu)+\
+                                               " vCPU, "+str(mem)+\
+                                               " GiB RAM -- "+desc[name[0]]
         except:
             print(item)
     res = OrderedDict(sorted(dflavors.items(), key=lambda t: t[0]))
     return res
 
 if __name__ == '__main__':
-    global verbose
-    verbose = False
+    VERBOSE = False
     parser = argparse.ArgumentParser(description="Provide AWS informations using sdk and web site")
-    parser.add_argument('-cbt', '--count-by-type', action='store_true', default=False, help='Count ec2 instances for each flavor')
-    parser.add_argument('-cbu', '--count-by-user', action='store', dest='user', default=False, help='Count ec2 instances for specified user')
-    parser.add_argument('-gf', '--get-flavors', action='store_true', default=False, help='Get list of all available flavors')
-    parser.add_argument('-le', '--list-elb', action='store_true', default=False, help='List all ELB')
-    parser.add_argument('-li', '--list-ec2instances', action='store_true', default=False, help='List all ec2 instances')
-    parser.add_argument('-lr', '--list-rds', action='store_true', default=False, help='List all RDS instances')
-    parser.add_argument('-ta', '--trusted-advisor', action='store_true', default=False, help='Get advice from Trusted Advisor service')
-    parser.add_argument('-ov', '--old-volumes', action='store_true', default=False, help='Get a list of volumes that are older than 30 days and unused')
-    parser.add_argument('-v', '--verbose', action='store_true', default=False, help='Output will be more verbose')
+    parser.add_argument('-cbt', '--count-by-type', action='store_true',
+                        default=False, help='Count ec2 instances for each flavor')
+    parser.add_argument('-cbu', '--count-by-user', action='store', dest='user',
+                        default=False, help='Count ec2 instances for specified user')
+    parser.add_argument('-gf', '--get-flavors', action='store_true',
+                        default=False, help='Get list of all available flavors')
+    parser.add_argument('-le', '--list-elb', action='store_true',
+                        default=False, help='List all ELB')
+    parser.add_argument('-li', '--list-ec2instances', action='store_true',
+                        default=False, help='List all ec2 instances')
+    parser.add_argument('-lr', '--list-rds', action='store_true',
+                        default=False, help='List all RDS instances')
+    parser.add_argument('-ta', '--trusted-advisor', action='store_true',
+                        default=False, help='Get advice from Trusted Advisor service')
+    parser.add_argument('-ov', '--old-volumes', action='store_true',
+                        default=False,
+                        help='Get a list of volumes that are older than 30 days and unused')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
     try:
-        if dargs.verbose:
-            verbose = True
+        if dargs.VERBOSE:
+            VERBOSE = True
         if dargs.count_by_type:
             countInstanceByType()
         elif dargs.user:
             getUserInstances(dargs.user)
         elif dargs.get_flavors:
-            res = getInstanceTypes()
-            for k, v in res.items():
-                print(k+":"+v)
+            resp = getInstanceTypes()
+            for flavorName, details  in resp.items():
+                print(flavorName+":"+details)
         elif dargs.list_elb:
-            res = listElb()
-            print('\n'.join(res))
+            resp = listElb()
+            print('\n'.join(resp))
         elif dargs.list_ec2instances:
             listInstances()
         elif dargs.list_rds:
-            res = listRds()
-            print('\n'.join(res))
+            resp = listRds()
+            print('\n'.join(resp))
         elif dargs.trusted_advisor:
-            res = getAdvise()
-            print(res)
+            resp = getAdvise()
+            print(resp)
         elif dargs.old_volumes:
-            res = getOldUnusedVols()
-            print('\n'.join(res))
+            resp = getOldUnusedVols()
+            print('\n'.join(resp))
         else:
             parser.print_help()
     except:
