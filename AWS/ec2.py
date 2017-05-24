@@ -15,6 +15,9 @@ EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
 ELBC = boto3.client(service_name='elb', aws_access_key_id=ACCESS_KEY_ID,
                     aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 
+SUPPORTC = boto3.client(service_name='support', aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY, region_name="us-east-1")
+
 DRY = True
 
 #EC2 Volumes
@@ -163,3 +166,32 @@ def getElbInstance(verbose,elbName):
     )
     linstances = delb['LoadBalancerDescriptions'][0]['Instances']
     return linstances
+
+def getIdleELB(verbose):
+    """Get list of Idle ELB"""
+    lIdleElb = []
+    totalSavings = 0
+    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
+    for it in jResp['checks']:
+        if it['category'] == 'cost_optimizing' and it['name'] == 'Idle Load Balancers':
+            jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
+                                                                    language="en")
+            for elb in jResp2['result']['flaggedResources']:
+                if 'No active back-end instances' in elb['metadata']:
+                    linstances = ec2.getElbInstance(False,elb['metadata'][1])
+                    if len(linstances) == 0:#if no instances
+                        lIdleElb.append(elb['metadata'][1])
+                        totalSavings += float(elb['metadata'][3][1:])
+                    for instance in linstances:#search if instance still exist
+                        haveInstance = True
+                        try:
+                            dinstance = ec2.getInstance(False,instance['InstanceId'])
+                            haveInstance = True
+                        except Exception as e:
+                            if re.search('InvalidInstanceID.NotFound', str(e)):
+                                haveInstance = False
+                        if not haveInstance:
+                            lIdleElb.append(elb['metadata'][1])
+                            totalSavings += float(elb['metadata'][3][1:])
+    print("You can save up to "+str(totalSavings)+"$")
+    return lIdleElb

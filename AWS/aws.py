@@ -87,52 +87,6 @@ def getAdvise(verbose):
                             print(k+":"+k1+":"+it['name'])
     return "You can save up to "+str(totalSavings)+"$"
 
-def getIdleRDS(verbose):
-    """Get list of Idle RDS instances"""
-    lrds = []
-    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
-    for it in jResp['checks']:
-        if it['category'] == 'cost_optimizing' and it['name'] == 'Amazon RDS Idle DB Instances':
-            jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
-                                                                    language="en")
-            totalSavings = str(jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings'])
-            for rds in jResp2['result']['flaggedResources']:
-                if '14+' in rds['metadata']:
-                    if verbose:
-                        lrds.append(';'.join(rds['metadata']))
-                    else:
-                        lrds.append(rds['metadata'][1])
-    print("You can save up to "+totalSavings)
-    return lrds
-
-def getIdleELB(verbose):
-    """Get list of Idle ELB"""
-    lelb = []
-    lIdleElb = []
-    jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
-    for it in jResp['checks']:
-        if it['category'] == 'cost_optimizing' and it['name'] == 'Idle Load Balancers':
-            jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
-                                                                    language="en")
-            for elb in jResp2['result']['flaggedResources']:
-                if 'No active back-end instances' in elb['metadata']:
-                    lelb.append(elb['metadata'][1])
-    for elb in lelb:
-        linstances = ec2.getElbInstance(False,elb)
-        if len(linstances) == 0:
-            lIdleElb.append(elb)
-        for instance in linstances:
-            haveInstance = True
-            try:
-                dinstance = ec2.getInstance(False,instance['InstanceId'])
-                haveInstance = True
-            except Exception as e:
-                if re.search('InvalidInstanceID.NotFound', str(e)):
-                    haveInstance = False
-            if not haveInstance:
-                lIdleElb.append(elb)
-    return lIdleElb
-
 #OTHER
 def ignoreCertificate():
     """Simple function to ignore ssl certificate verification"""
@@ -191,12 +145,16 @@ if __name__ == '__main__':
     parser.add_argument('-cbt', '--count-by-type', action='store_true',
                         default=False, help='Count ec2 instances for each flavor')
     parser.add_argument('-cbu', '--count-by-user', action='store', dest='user',
-                        default=False, help='Count ec2 instances for specified user')
+                        metavar='<user>', default=False, help='Count ec2 instances for specified user')
     parser.add_argument('-cov', '--clean-old-volumes', action='store_true',
                         default=False,
                         help='Delete volumes that are older than 30 days and unused')
     parser.add_argument('-gf', '--get-flavors', action='store_true',
                         default=False, help='Get list of all available flavors')
+    parser.add_argument('-ie', '--idle-elb', action='store_true',
+                        default=False, help='Get list of idle elb that can be deleted (no instances)')
+    parser.add_argument('-ir', '--idle-rds', action='store_true',
+                        default=False, help='Get list of idle rds that can be deleted (14+ days without connection)')
     parser.add_argument('-le', '--list-elb', action='store_true',
                         default=False, help='List all ELB')
     parser.add_argument('-li', '--list-ec2instances', action='store_true',
@@ -204,9 +162,9 @@ if __name__ == '__main__':
     parser.add_argument('-lr', '--list-rds', action='store_true',
                         default=False, help='List all RDS instances')
     parser.add_argument('--start-instance', action='store', dest='StartInstanceID',
-                        default=False, help='Start the specified instance')
+                        metavar='<instanceId>', default=False, help='Start the specified instance')
     parser.add_argument('--stop-instance', action='store', dest='StopInstanceID',
-                        default=False, help='Stop the specified instance')
+                        metavar='<instanceId>', default=False, help='Stop the specified instance')
     parser.add_argument('-ta', '--trusted-advisor', action='store_true',
                         default=False, help='Get advice from Trusted Advisor service')
     parser.add_argument('-ov', '--old-volumes', action='store_true',
@@ -228,6 +186,12 @@ if __name__ == '__main__':
             resp = ec2.getInstanceTypes()
             for flavorName, details  in resp.items():
                 print(flavorName+":"+details)
+        elif dargs.idle_elb:
+            resp = ec2.getIdleELB(VERBOSE)
+            print('\n'.join(resp))
+        elif dargs.idle_rds:
+            resp = rds.getIdleRDS(VERBOSE)
+            print('\n'.join(resp))
         elif dargs.list_elb:
             resp = ec2.listElb(VERBOSE)
             print('\n'.join(resp))
