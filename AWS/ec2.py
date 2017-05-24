@@ -38,6 +38,18 @@ def getOldUnusedVols(verbose):
                     res.append(vol['VolumeId'])
     return res
 
+def cleanupOldUnusedVols(verbose):
+    """Delete old unused volumes"""
+    lvol = getOldUnusedVols(False)
+    for vol in lvol:
+        resp = EC2C.delete_volume(
+        DryRun = True,
+        VolumeId = vol
+        )
+        if verbose:
+            print("Volume with id: "+vol+" deleted")
+    print("Delete "+str(len(lvol))+" volumes")
+
 #EC2 Instances
 def getUserInstances(verbose,user):
     """Count number of instances for specific user"""

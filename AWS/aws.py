@@ -9,7 +9,7 @@ Must do the following:
 
 - EC2:Volumes
 + retrieve old unused volumes
-- cleanup old volumes
++ cleanup old volumes
 
 - ELB
 + list all ELB
@@ -149,6 +149,9 @@ if __name__ == '__main__':
                         default=False, help='Count ec2 instances for each flavor')
     parser.add_argument('-cbu', '--count-by-user', action='store', dest='user',
                         default=False, help='Count ec2 instances for specified user')
+    parser.add_argument('-cov', '--clean-old-volumes', action='store_true',
+                        default=False,
+                        help='Delete volumes that are older than 30 days and unused')
     parser.add_argument('-gf', '--get-flavors', action='store_true',
                         default=False, help='Get list of all available flavors')
     parser.add_argument('-le', '--list-elb', action='store_true',
@@ -165,14 +168,15 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    #try:
-    if 1:
+    try:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
             ec2.countInstanceByType(VERBOSE)
         elif dargs.user:
             ec2.getUserInstances(VERBOSE,dargs.user)
+        elif dargs.clean_old_volumes:
+            ec2.cleanupOldUnusedVols(VERBOSE)
         elif dargs.get_flavors:
             resp = ec2.getInstanceTypes()
             for flavorName, details  in resp.items():
@@ -193,5 +197,5 @@ if __name__ == '__main__':
             print('\n'.join(resp))
         else:
             parser.print_help()
-    #except:
-    #    parser.print_help()
+    except:
+        parser.print_help()
