@@ -4,7 +4,7 @@ Must do the following:
 + count number of instances by types
 + count instances by user
 + list all ec2 instances with info
-- Stop/Start Instances
++ Stop/Start Instances
 - List what reservation could be made to optimize cost
 
 - EC2:Volumes
@@ -160,6 +160,10 @@ if __name__ == '__main__':
                         default=False, help='List all ec2 instances')
     parser.add_argument('-lr', '--list-rds', action='store_true',
                         default=False, help='List all RDS instances')
+    parser.add_argument('--start-instance', action='store', dest='StartInstanceID',
+                        default=False, help='Start the specified instance')
+    parser.add_argument('--stop-instance', action='store', dest='StopInstanceID',
+                        default=False, help='Stop the specified instance')
     parser.add_argument('-ta', '--trusted-advisor', action='store_true',
                         default=False, help='Get advice from Trusted Advisor service')
     parser.add_argument('-ov', '--old-volumes', action='store_true',
@@ -189,6 +193,10 @@ if __name__ == '__main__':
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
+        elif dargs.StartInstanceID:
+            ec2.startInstance(dargs.StartInstanceID)
+        elif dargs.StopInstanceID:
+            ec2.stopInstance(dargs.StopInstanceID)
         elif dargs.trusted_advisor:
             resp = getAdvise(VERBOSE)
             print(resp)

@@ -15,6 +15,8 @@ EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
 ELBC = boto3.client(service_name='elb', aws_access_key_id=ACCESS_KEY_ID,
                     aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 
+DRY = True
+
 #EC2 Volumes
 def getOldUnusedVols(verbose):
     """Get List of volumes that are available and 30 days old at least"""
@@ -43,7 +45,7 @@ def cleanupOldUnusedVols(verbose):
     lvol = getOldUnusedVols(False)
     for vol in lvol:
         resp = EC2C.delete_volume(
-        DryRun = True,
+        DryRun = DRY,
         VolumeId = vol
         )
         if verbose:
@@ -111,6 +113,16 @@ def countInstanceByType(verbose):
             instancesByType[instance.instance_type] = 1
     for k, v in instancesByType.items():
         print(k+":"+str(v))
+
+def stopInstance(instanceID):
+    """Simple method to stop an instance"""
+    response = client.stop_instances(
+    DryRun=DRY,
+    InstanceIds=[
+        instanceID,
+    ],
+    Force=True
+    )
 
 #ELB
 def listElb(verbose):
