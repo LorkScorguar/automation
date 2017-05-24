@@ -1,23 +1,25 @@
 """
 Must do the following:
 - EC2:Instances
-+ count number of instances by types
-+ count instances by user
-+ list all ec2 instances with info
++ Count number of instances by types
++ Count instances by user
++ List all ec2 instances with info
 + Stop/Start Instances
 - List what reservation could be made to optimize cost
 
 - EC2:Volumes
-+ retrieve old unused volumes
-+ cleanup old volumes
++ List old unused volumes
++ Delete old unused volumes
 
 - ELB
-+ list all ELB
-- Get Idle ELB
++ List all ELB
++ Get Idle ELB
++ Delete Idle ELB
 
 - RDS
-+ list all RDS instance
-- Get Idle RDS
++ List all RDS instance
++ Get Idle RDS
++ Delete Idle RDS
 
 - ALL
 + Get Trusted Advisor infos
@@ -146,7 +148,13 @@ if __name__ == '__main__':
                         default=False, help='Count ec2 instances for each flavor')
     parser.add_argument('-cbu', '--count-by-user', action='store', dest='user',
                         metavar='<user>', default=False, help='Count ec2 instances for specified user')
-    parser.add_argument('-cov', '--clean-old-volumes', action='store_true',
+    parser.add_argument('-die', '--delete-idle-elb', action='store_true',
+                        default=False,
+                        help='Delete elb without instances')
+    parser.add_argument('-dir', '--delete-idle-rds', action='store_true',
+                        default=False,
+                        help='Delete RDS instances not used since 14+ days')
+    parser.add_argument('-dov', '--delete-old-volumes', action='store_true',
                         default=False,
                         help='Delete volumes that are older than 30 days and unused')
     parser.add_argument('-gf', '--get-flavors', action='store_true',
@@ -180,7 +188,11 @@ if __name__ == '__main__':
             ec2.countInstanceByType(VERBOSE)
         elif dargs.user:
             ec2.getUserInstances(VERBOSE,dargs.user)
-        elif dargs.clean_old_volumes:
+        elif dargs.delete_idle_elb:
+            ec2.cleanupELB(VERBOSE)
+        elif dargs.delete_idle_rds:
+            rds.cleanupRDS(VERBOSE)
+        elif dargs.delete_old_volumes:
             ec2.cleanupOldUnusedVols(VERBOSE)
         elif dargs.get_flavors:
             resp = ec2.getInstanceTypes()

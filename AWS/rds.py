@@ -45,3 +45,15 @@ def getIdleRDS(verbose):
                         lrds.append(rds['metadata'][1])
     print("You can save up to "+str(totalSavings)+"$")
     return lrds
+
+def deleteRDS(verbose,instanceId):
+    """Delete a RDS instance"""
+    RDSC.delete_db_instance(DBInstanceIdentifier=instanceId)
+    if verbose:
+        print("Instance with name: "+str(instanceId)+" deleted")
+
+def cleanupRDS(verbose):
+    """Delete all Idle RDS instances"""
+    lrds = getIdleRDS(False)
+    for rds in lrds:
+        deleteRDS(verbose,rds)

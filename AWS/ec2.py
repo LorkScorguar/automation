@@ -195,3 +195,15 @@ def getIdleELB(verbose):
                             totalSavings += float(elb['metadata'][3][1:])
     print("You can save up to "+str(totalSavings)+"$")
     return lIdleElb
+
+def deleteELB(verbose,elbName):
+    """Delete a RDS instance"""
+    ELBC.delete_load_balancer(LoadBalancerName=elbName)
+    if verbose:
+        print("ELB with name: "+str(elbName)+" deleted")
+
+def cleanupELB(verbose):
+    """Delete all Idle ELB"""
+    lelb = getIdleELB(False)
+    for elb in lelb:
+        deleteELB(verbose,elb)
