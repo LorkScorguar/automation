@@ -4,15 +4,22 @@ Must do the following:
 + count number of instances by types
 + count instances by user
 + list all ec2 instances with info
+- Stop/Start Instances
+- List what reservation could be made to optimize cost
 
 - EC2:Volumes
 + retrieve old unused volumes
+- cleanup old volumes
 
 - ELB
-+ list all elb
++ list all ELB
+- Get Idle ELB
+- Stop/Start ELB
 
 - RDS
-+ list all RDS db
++ list all RDS instance
+- Get Idle RDS
+- Stop/Start instance
 
 - ALL
 + Get Trusted Advisor infos
@@ -26,7 +33,6 @@ import re
 import urllib.request
 import ssl
 from collections import OrderedDict
-import datetime
 import argparse
 
 import boto3
@@ -40,23 +46,11 @@ os.environ["HTTPS_PROXY"] = secret.getProxy()
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
 
-EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
-                      aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
-EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
-                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
-
-RDSC = boto3.client(service_name='rds', aws_access_key_id=ACCESS_KEY_ID,
-                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
-
-ELBC = boto3.client(service_name='elb', aws_access_key_id=ACCESS_KEY_ID,
-                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
-
 SUPPORTC = boto3.client(service_name='support', aws_access_key_id=ACCESS_KEY_ID,
                         aws_secret_access_key=SECRET_ACCESS_KEY, region_name="us-east-1")
 
-
 #ALL
-def getAdvise():
+def getAdvise(verbose):
     """Get Advises from Trusted Advisor"""
     totalSavings = 0
     dreport = {}
@@ -76,7 +70,7 @@ def getAdvise():
         except:
             dcategory[jResp2['result']['status']] = [ditem]
         dreport[check['category']] = dcategory
-    if VERBOSE:
+    if verbose:
         for k, v in dreport.items():
             for k1, v1 in v.items():
                 for it in v1:
@@ -171,32 +165,33 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    try:
-        if dargs.VERBOSE:
+    #try:
+    if 1:
+        if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
-            ec2.countInstanceByType()
+            ec2.countInstanceByType(VERBOSE)
         elif dargs.user:
-            ec2.getUserInstances(dargs.user)
+            ec2.getUserInstances(VERBOSE,dargs.user)
         elif dargs.get_flavors:
             resp = ec2.getInstanceTypes()
             for flavorName, details  in resp.items():
                 print(flavorName+":"+details)
         elif dargs.list_elb:
-            resp = ec2.listElb()
+            resp = ec2.listElb(VERBOSE)
             print('\n'.join(resp))
         elif dargs.list_ec2instances:
-            ec2.listInstances()
+            ec2.listInstances(VERBOSE)
         elif dargs.list_rds:
-            resp = rds.listRds()
+            resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
         elif dargs.trusted_advisor:
-            resp = getAdvise()
+            resp = getAdvise(VERBOSE)
             print(resp)
         elif dargs.old_volumes:
-            resp = ec2.getOldUnusedVols()
+            resp = ec2.getOldUnusedVols(VERBOSE)
             print('\n'.join(resp))
         else:
             parser.print_help()
-    except:
-        parser.print_help()
+    #except:
+    #    parser.print_help()

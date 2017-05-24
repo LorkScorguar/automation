@@ -1,8 +1,22 @@
 """
 Module to manipulate ec2 resources
 """
+import datetime
+import boto3
+import secret
+
+ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
+REGION = secret.getRegion()
+
+EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
+                      aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
+EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
+                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
+ELBC = boto3.client(service_name='elb', aws_access_key_id=ACCESS_KEY_ID,
+                    aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
+
 #EC2 Volumes
-def getOldUnusedVols():
+def getOldUnusedVols(verbose):
     """Get List of volumes that are available and 30 days old at least"""
     res = []
     ec2volumes = EC2C.describe_volumes(Filters=[
@@ -18,17 +32,20 @@ def getOldUnusedVols():
     for vol in ec2volumes:
         if not 'Tags' in vol:
             if vol['CreateTime'] < days30:
-                res.append(vol['VolumeId'])
+                if verbose:
+                    res.append(vol['VolumeId']+";"+str(vol['CreateTime']))
+                else:
+                    res.append(vol['VolumeId'])
     return res
 
 #EC2 Instances
-def getUserInstances(user):
+def getUserInstances(verbose,user):
     """Count number of instances for specific user"""
     nb = 0
     instances = EC2R.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
     for instance in instances:
         nb += 1
-        if VERBOSE:
+        if verbose:
             server = str(instance.id)+";"+str(instance.instance_type)+";"+\
                      str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
             try:
@@ -47,11 +64,11 @@ def getUserInstances(user):
         print(server)
     print("Found "+str(nb)+" instances")
 
-def listInstances():
+def listInstances(verbose):
     """list all ec2 instances"""
     nb = 0
     for instance in EC2R.instances.all():
-        if VERBOSE:
+        if verbose:
             server = str(instance.id)+":"+str(instance.instance_type)+","+\
                      str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
             nb += 1
@@ -66,12 +83,13 @@ def listInstances():
             except:
                 continue
         else:
+            nb += 1
             server = str(instance.id)+":"+str(instance.instance_type)+","+\
                      str(instance.state['Name'])
         print(server)
     print("Found "+str(nb)+" instances")
 
-def countInstanceByType():
+def countInstanceByType(verbose):
     """Count instances by flavors"""
     instancesByType = {}
     for instance in EC2R.instances.all():
@@ -83,12 +101,12 @@ def countInstanceByType():
         print(k+":"+str(v))
 
 #ELB
-def listElb():
+def listElb(verbose):
     """List all ELB"""
     res = []
     delb = ELBC.describe_load_balancers()
     for elb in delb['LoadBalancerDescriptions']:
-        if VERBOSE:
+        if verbose:
             instances = ""
             for instance in elb['Instances']:
                 instances += ","+instance['InstanceId']
