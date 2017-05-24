@@ -114,6 +114,15 @@ def countInstanceByType(verbose):
     for k, v in instancesByType.items():
         print(k+":"+str(v))
 
+def startInstance(instanceID):
+    """Simple method to start an instance"""
+    response = client.start_instances(
+    DryRun=DRY,
+    InstanceIds=[
+        instanceID,
+    ],
+    )
+
 def stopInstance(instanceID):
     """Simple method to stop an instance"""
     response = client.stop_instances(
