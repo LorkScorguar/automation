@@ -108,23 +108,30 @@ def getIdleRDS(verbose):
 def getIdleELB(verbose):
     """Get list of Idle ELB"""
     lelb = []
+    lIdleElb = []
     jResp = SUPPORTC.describe_trusted_advisor_checks(language="en")
     for it in jResp['checks']:
         if it['category'] == 'cost_optimizing' and it['name'] == 'Idle Load Balancers':
             jResp2 = SUPPORTC.describe_trusted_advisor_check_result(checkId=str(it['id']),
                                                                     language="en")
-            totalSavings = str(jResp2['result']['categorySpecificSummary']['costOptimizing']['estimatedMonthlySavings'])
             for elb in jResp2['result']['flaggedResources']:
                 if 'No active back-end instances' in elb['metadata']:
-                    if verbose:
-                        lelb.append(';'.join(elb['metadata']))
-                    else:
-                        lelb.append(elb['metadata'][1])
-    print("You can save up to "+totalSavings)
-    return lelb
-
-lelb=getIdleELB(False)
-print(lelb)
+                    lelb.append(elb['metadata'][1])
+    for elb in lelb:
+        linstances = ec2.getElbInstance(False,elb)
+        if len(linstances) == 0:
+            lIdleElb.append(elb)
+        for instance in linstances:
+            haveInstance = True
+            try:
+                dinstance = ec2.getInstance(False,instance['InstanceId'])
+                haveInstance = True
+            except Exception as e:
+                if re.search('InvalidInstanceID.NotFound', str(e)):
+                    haveInstance = False
+            if not haveInstance:
+                lIdleElb.append(elb)
+    return lIdleElb
 
 #OTHER
 def ignoreCertificate():
@@ -137,7 +144,6 @@ def ignoreCertificate():
 def getInstanceTypes():
     """Parse AWS website to list all instance flavors"""
     dflavors = {}
-    #m3.medium -- 1 vCPU, 3.75 GiB RAM -- General purpose
     desc = {"t":"General Purpose",
             "m":"General Purpose",
             "c":"Compute Optimized",

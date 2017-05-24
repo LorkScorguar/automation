@@ -53,6 +53,11 @@ def cleanupOldUnusedVols(verbose):
     print("Delete "+str(len(lvol))+" volumes")
 
 #EC2 Instances
+def getInstance(verbose,instanceId):
+    """Simple function to get informations for an instance"""
+    dinstance = EC2C.describe_instances(InstanceIds=[instanceId])
+    return dinstance
+
 def getUserInstances(verbose,user):
     """Count number of instances for specific user"""
     nb = 0
@@ -149,3 +154,12 @@ def listElb(verbose):
         else:
             res.append(elb['LoadBalancerName']+";"+','.join(elb['Subnets']))
     return res
+
+def getElbInstance(verbose,elbName):
+    """Return list of instances behind an elb"""
+    linstances = []
+    delb = ELBC.describe_load_balancers(
+        LoadBalancerNames = [elbName]
+    )
+    linstances = delb['LoadBalancerDescriptions'][0]['Instances']
+    return linstances
