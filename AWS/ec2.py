@@ -2,6 +2,7 @@
 Module to manipulate ec2 resources
 """
 import datetime
+import re
 import boto3
 import secret
 
@@ -58,6 +59,25 @@ def cleanupOldUnusedVols(verbose):
     print("Delete "+str(len(lvol))+" volumes")
 
 #EC2 Instances
+def getAmi(verbose,amiId):
+    """Simple function to get ami details"""
+    dami = {}
+    jResp = EC2C.describe_images(ImageIds=[amiId])
+    if 'Platform' in jResp['Images'][0]:
+        platform = jResp['Images'][0]['Platform']
+    else:
+        platform = None
+    if verbose:
+        dami[amiId] = jResp['Images'][0]['Name']+";"+\
+                      platform+";"+\
+                      jResp['Images'][0]['Architecture']+";"+\
+                      jResp['Images'][0]['ImageType']+";"+\
+                      jResp['Images'][0]['VirtualizationType']
+    else:
+        dami[amiId] = jResp['Images'][0]['Name']+";"+\
+                      platform
+    return dami
+
 def getInstance(verbose,instanceId):
     """Simple function to get informations for an instance"""
     dinstance = EC2C.describe_instances(InstanceIds=[instanceId])
@@ -126,6 +146,26 @@ def countInstanceByType(verbose):
             instancesByType[instance.instance_type] = 1
     return instancesByType
 
+def countInstanceByTypeByOS(verbose):
+    """Count instances by flavors and by OS"""
+    instancesByType = {}
+    jResp = EC2C.describe_instances()
+    for reserv in jResp['Reservations']:
+        for instance in reserv['Instances']:
+            if 'Platform' in instance and instance['Platform'] == 'windows':
+                try:
+                    instancesByType[instance['InstanceType']+";"+instance['Platform']] += 1
+                except:
+                    instancesByType[instance['InstanceType']+";"+instance['Platform']] = 1
+            else:
+                getAmi(False,instance['ImageId'])
+                break
+                try:
+                    instancesByType[instance['InstanceType']+";linux"] += 1
+                except:
+                    instancesByType[instance['InstanceType']+";linux"] = 1
+    return instancesByType
+
 def startInstance(instanceID):
     """Simple method to start an instance"""
     response = client.start_instances(
@@ -146,33 +186,49 @@ def stopInstance(instanceID):
     )
 
 def getReservedInstances(verbose):
-    lres = []
+    """Function to get reserved instances"""
+    lres = {}
     jResp = EC2C.describe_reserved_instances()
     for reserved in jResp['ReservedInstances']:
         if reserved['State'] == 'active':
             if verbose:
-                lres.append(reserved['InstanceType']+";"+\
-                            #reserved['AvailabilityZone']+";"+\
-                            str(reserved['Start'])+";"+\
-                            str(reserved['End'])+";"+\
-                            str(reserved['InstanceCount'])+";"+\
-                            reserved['ProductDescription']+";"+\
-                            str(reserved['UsagePrice']))
+                lres[reserved['InstanceType']] = str(reserved['Start'])+";"+\
+                                                 str(reserved['End'])+";"+\
+                                                 str(reserved['InstanceCount'])+";"+\
+                                                 reserved['ProductDescription']+";"+\
+                                                 str(reserved['UsagePrice'])
             else:
-                lres.append(reserved['InstanceType']+";"+\
-                            #reserved['AvailabilityZone']+";"+\
-                            str(reserved['Start'])+";"+\
-                            str(reserved['End'])+";"+\
-                            str(reserved['InstanceCount'])+";"+\
-                            reserved['ProductDescription'])
+                if re.search("win", reserved['ProductDescription'], re.IGNORECASE):
+                    os = "windows"
+                elif re.search("red hat", reserved['ProductDescription'], re.IGNORECASE):
+                    os = "redhat"
+                elif re.search("suse", reserved['ProductDescription'], re.IGNORECASE):
+                    os = "suse"
+                else:
+                    os = "linux"
+                lres[reserved['InstanceType']+";"+os] = str(reserved['InstanceCount'])
     return lres
 
 def optimizeReservation():
-    lreserved = getReservedInstances(False)
-    linstances = listInstances(False)
-    count_by_type = countInstanceByType(False)
-    print(count_by_type)
-    print("You must do the following reservations:")
+    """Try to optimize reservations
+    + check if reservation are fully used/partially or not at all
+    - check if reservation is needed for a flavor due to instances usage
+    - provide price drop estimate"""
+    dreserved = getReservedInstances(False)
+    count_by_type_os = countInstanceByTypeByOS(False)
+    for typos, nb in count_by_type_os.items():
+        if typos in dreserved:
+            if int(count_by_type_os[typos]) - int(dreserved[typos]) >= 0:
+                count_by_type_os[typos] = int(count_by_type_os[typos]) - int(dreserved[typos])
+                print("Reservation fully used for "+typos)
+            else:
+                print("Reservation not fully used for "+typos+": "+dreserved[typos]+"reserved but only "+count_by_type_os[typos]+" instances")
+    for typos, nb in dreserved.items():
+        if typos not in count_by_type_os:
+            print("Reservation is not used for "+typos)
+    print("\nInstances below doesn't have reservation:")
+    for k, v in count_by_type_os.items():
+        print(k+":"+str(v))
 
 optimizeReservation()
 #ELB
