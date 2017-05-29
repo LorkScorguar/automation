@@ -66,10 +66,13 @@ def getInstance(verbose,instanceId):
 def listInstances(verbose):
     """list all ec2 instances"""
     nb = 0
+    lserver = []
     for instance in EC2R.instances.all():
         if verbose:
-            server = str(instance.id)+":"+str(instance.instance_type)+","+\
-                     str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
+            lserver.append(str(instance.id)+":"+\
+                           str(instance.instance_type)+","+\
+                           str(instance.state['Name'])+";"+\
+                           str(instance.private_ip_address)+";")
             nb += 1
             try:
                 for tag in instance.tags:
@@ -83,10 +86,10 @@ def listInstances(verbose):
                 continue
         else:
             nb += 1
-            server = str(instance.id)+":"+str(instance.instance_type)+","+\
-                     str(instance.state['Name'])
-        print(server)
-    print("Found "+str(nb)+" instances")
+            lserver.append(str(instance.id)+":"+\
+                           str(instance.instance_type)+","+\
+                           str(instance.state['Name']))
+    return lserver
 
 def getUserInstances(verbose,user):
     """Count number of instances for specific user"""
@@ -147,23 +150,30 @@ def getReservedInstances(verbose):
     lres = []
     jResp = EC2C.describe_reserved_instances()
     for reserved in jResp['ReservedInstances']:
-        if jResp['State'] == 'active'
+        if reserved['State'] == 'active':
             if verbose:
                 lres.append(reserved['InstanceType']+";"+\
-                            reserved['AvailabilityZone']+";"+\
-                            reserved['Start']+";"+reserved['End']+";"+\
-                            reserved['InstanceCount']+";"+\
-                            reserved['ProductDescription']+";"+reserved['UsagePrice'])
+                            #reserved['AvailabilityZone']+";"+\
+                            str(reserved['Start'])+";"+\
+                            str(reserved['End'])+";"+\
+                            str(reserved['InstanceCount'])+";"+\
+                            reserved['ProductDescription']+";"+\
+                            str(reserved['UsagePrice']))
             else:
                 lres.append(reserved['InstanceType']+";"+\
-                            reserved['AvailabilityZone']+";"+\
-                            reserved['Start']+";"+reserved['End']+";"+\
-                            reserved['InstanceCount']+";"+\
+                            #reserved['AvailabilityZone']+";"+\
+                            str(reserved['Start'])+";"+\
+                            str(reserved['End'])+";"+\
+                            str(reserved['InstanceCount'])+";"+\
                             reserved['ProductDescription'])
+    return lres
 
 def optimizeReservation():
     lreserved = getReservedInstances(False)
     linstances = listInstances(False)
+    print(lreserved)
+    print("\n\n")
+    print(linstances)
     print("You must do the following reservations:")
 
 optimizeReservation()

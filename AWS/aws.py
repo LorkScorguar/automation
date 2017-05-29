@@ -208,7 +208,9 @@ if __name__ == '__main__':
             resp = ec2.listElb(VERBOSE)
             print('\n'.join(resp))
         elif dargs.list_ec2instances:
-            ec2.listInstances(VERBOSE)
+            resp = ec2.listInstances(VERBOSE)
+            print('\n'.join(resp))
+            print("Found "+str(len(resp))+" instances")
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
