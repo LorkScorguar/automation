@@ -185,7 +185,9 @@ if __name__ == '__main__':
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
-            ec2.countInstanceByType(VERBOSE)
+            resp = ec2.countInstanceByType(VERBOSE)
+            for k, v in resp.items():
+                print(k+":"+str(v))
         elif dargs.user:
             ec2.getUserInstances(VERBOSE,dargs.user)
         elif dargs.delete_idle_elb:

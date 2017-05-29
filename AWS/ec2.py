@@ -124,8 +124,7 @@ def countInstanceByType(verbose):
             instancesByType[instance.instance_type] += 1
         except:
             instancesByType[instance.instance_type] = 1
-    for k, v in instancesByType.items():
-        print(k+":"+str(v))
+    return instancesByType
 
 def startInstance(instanceID):
     """Simple method to start an instance"""
@@ -171,9 +170,8 @@ def getReservedInstances(verbose):
 def optimizeReservation():
     lreserved = getReservedInstances(False)
     linstances = listInstances(False)
-    print(lreserved)
-    print("\n\n")
-    print(linstances)
+    count_by_type = countInstanceByType(False)
+    print(count_by_type)
     print("You must do the following reservations:")
 
 optimizeReservation()
