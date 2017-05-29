@@ -7,7 +7,9 @@ import secret
 
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
-
+import os
+os.environ["HTTP_PROXY"] = secret.getProxy()
+os.environ["HTTPS_PROXY"] = secret.getProxy()
 EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
                       aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
@@ -61,31 +63,6 @@ def getInstance(verbose,instanceId):
     dinstance = EC2C.describe_instances(InstanceIds=[instanceId])
     return dinstance
 
-def getUserInstances(verbose,user):
-    """Count number of instances for specific user"""
-    nb = 0
-    instances = EC2R.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
-    for instance in instances:
-        nb += 1
-        if verbose:
-            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
-                     str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
-            try:
-                for tag in instance.tags:
-                    if tag['Key'] == 'Description':
-                        server += tag['Value']+";"
-                    if tag['Key'] == 'Owner':
-                        server += tag['Value']+";"
-                    if tag['Key'] == 'ManagedBy':
-                        server += tag['Value']+";"
-            except:
-                continue
-        else:
-            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
-                     str(instance.state['Name'])
-        print(server)
-    print("Found "+str(nb)+" instances")
-
 def listInstances(verbose):
     """list all ec2 instances"""
     nb = 0
@@ -107,6 +84,31 @@ def listInstances(verbose):
         else:
             nb += 1
             server = str(instance.id)+":"+str(instance.instance_type)+","+\
+                     str(instance.state['Name'])
+        print(server)
+    print("Found "+str(nb)+" instances")
+
+def getUserInstances(verbose,user):
+    """Count number of instances for specific user"""
+    nb = 0
+    instances = EC2R.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
+    for instance in instances:
+        nb += 1
+        if verbose:
+            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
+                     str(instance.state['Name'])+";"+str(instance.private_ip_address)+";"
+            try:
+                for tag in instance.tags:
+                    if tag['Key'] == 'Description':
+                        server += tag['Value']+";"
+                    if tag['Key'] == 'Owner':
+                        server += tag['Value']+";"
+                    if tag['Key'] == 'ManagedBy':
+                        server += tag['Value']+";"
+            except:
+                continue
+        else:
+            server = str(instance.id)+";"+str(instance.instance_type)+";"+\
                      str(instance.state['Name'])
         print(server)
     print("Found "+str(nb)+" instances")
@@ -141,6 +143,30 @@ def stopInstance(instanceID):
     Force=True
     )
 
+def getReservedInstances(verbose):
+    lres = []
+    jResp = EC2C.describe_reserved_instances()
+    for reserved in jResp['ReservedInstances']:
+        if jResp['State'] == 'active'
+            if verbose:
+                lres.append(reserved['InstanceType']+";"+\
+                            reserved['AvailabilityZone']+";"+\
+                            reserved['Start']+";"+reserved['End']+";"+\
+                            reserved['InstanceCount']+";"+\
+                            reserved['ProductDescription']+";"+reserved['UsagePrice'])
+            else:
+                lres.append(reserved['InstanceType']+";"+\
+                            reserved['AvailabilityZone']+";"+\
+                            reserved['Start']+";"+reserved['End']+";"+\
+                            reserved['InstanceCount']+";"+\
+                            reserved['ProductDescription'])
+
+def optimizeReservation():
+    lreserved = getReservedInstances(False)
+    linstances = listInstances(False)
+    print("You must do the following reservations:")
+
+optimizeReservation()
 #ELB
 def listElb(verbose):
     """List all ELB"""
