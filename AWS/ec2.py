@@ -8,9 +8,7 @@ import secret
 
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
-import os
-os.environ["HTTP_PROXY"] = secret.getProxy()
-os.environ["HTTPS_PROXY"] = secret.getProxy()
+
 EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
                       aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
 EC2C = boto3.client(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
@@ -230,7 +228,6 @@ def optimizeReservation():
     for k, v in count_by_type_os.items():
         print(k+":"+str(v))
 
-optimizeReservation()
 #ELB
 def listElb(verbose):
     """List all ELB"""
