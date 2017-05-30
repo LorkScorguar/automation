@@ -24,3 +24,7 @@ def listObjects(verbose, bucket):
         else:
             res[item['Key']]+";"+str(item['Size'])
     return res
+
+def downloadFile(bucket,fileKey):
+    fileName = open(fileKey, 'wb')
+    S3C.download_fileobj(bucket,fileKey,fileName)
