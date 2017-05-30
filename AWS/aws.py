@@ -181,7 +181,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    try:
+    #try:
+    if 1:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
@@ -211,8 +212,9 @@ if __name__ == '__main__':
             print('\n'.join(resp))
         elif dargs.list_ec2instances:
             resp = ec2.listInstances(VERBOSE)
-            print('\n'.join(resp))
-            print("Found "+str(len(resp))+" instances")
+            for k, v in resp.items():
+                print(k+":"+v)
+            print("Found "+str(len(resp.keys()))+" instances")
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
@@ -228,5 +230,5 @@ if __name__ == '__main__':
             print('\n'.join(resp))
         else:
             parser.print_help()
-    except:
-        parser.print_help()
+    #except:
+    #    parser.print_help()

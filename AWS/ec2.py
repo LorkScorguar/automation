@@ -3,11 +3,15 @@ Module to manipulate ec2 resources
 """
 import datetime
 import re
+import os
 import boto3
 import secret
 
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
+
+os.environ["HTTP_PROXY"] = secret.getProxy()
+os.environ["HTTPS_PROXY"] = secret.getProxy()
 
 EC2R = boto3.resource(service_name='ec2', aws_access_key_id=ACCESS_KEY_ID,
                       aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
@@ -87,29 +91,32 @@ def getInstance(verbose,instanceId):
 def listInstances(verbose):
     """list all ec2 instances"""
     nb = 0
-    lserver = []
-    for instance in EC2R.instances.all():
-        if verbose:
-            lserver.append(str(instance.id)+":"+\
-                           str(instance.instance_type)+","+\
-                           str(instance.state['Name'])+";"+\
-                           str(instance.private_ip_address)+";")
-            nb += 1
-            try:
-                for tag in instance.tags:
-                    if tag['Key'] == 'Description':
-                        server += tag['Value']+":"
-                    if tag['Key'] == 'Owner':
-                        server += tag['Value']+":"
-                    if tag['Key'] == 'ManagedBy':
-                        server += tag['Value']+":"
-            except:
-                continue
-        else:
-            nb += 1
-            lserver.append(str(instance.id)+":"+\
-                           str(instance.instance_type)+","+\
-                           str(instance.state['Name']))
+    lserver = {}
+    jResp = EC2C.describe_instances()
+    for reserv in jResp['Reservations']:
+        for instance in reserv['Instances']:
+            if verbose:
+                lserver[instance['InstanceId']] = str(instance['InstanceType'])+";"+\
+                                                  str(instance['State']['Name'])+";"+\
+                                                  str(instance['PrivateIpAddress'])+";"+\
+                                                  str(instance['LaunchTime'])+";"
+                nb += 1
+                try:
+                    for tag in instance['Tags']:
+                        if tag['Key'] == 'Description':
+                            server += tag['Value']+":"
+                        if tag['Key'] == 'Owner':
+                            server += tag['Value']+":"
+                        if tag['Key'] == 'ManagedBy':
+                            server += tag['Value']+":"
+                except:
+                    continue
+            else:
+                nb += 1
+                lserver[instance['InstanceId']] = str(instance['InstanceType'])+";"+\
+                                                  str(instance['State']['Name'])+";"+\
+                                                  str(instance['PrivateIpAddress'])+";"+\
+                                                  str(instance['LaunchTime'])
     return lserver
 
 def getUserInstances(verbose,user):

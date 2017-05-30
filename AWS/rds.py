@@ -2,11 +2,15 @@
 Module to manipulate RDS instances
 """
 
-import boto3
+
 import secret
+import os
+import boto3
 
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
+os.environ["HTTP_PROXY"] = secret.getProxy()
+os.environ["HTTPS_PROXY"] = secret.getProxy()
 
 RDSC = boto3.client(service_name='rds', aws_access_key_id=ACCESS_KEY_ID,
                     aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)

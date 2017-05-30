@@ -3,11 +3,15 @@ Module to manipulate ec2 resources
 """
 import datetime
 import re
+import os
 import boto3
 import secret
 
 ACCESS_KEY_ID, SECRET_ACCESS_KEY = secret.getAccess()
 REGION = secret.getRegion()
+
+os.environ["HTTP_PROXY"] = secret.getProxy()
+os.environ["HTTPS_PROXY"] = secret.getProxy()
 
 S3C = boto3.client(service_name='s3', aws_access_key_id=ACCESS_KEY_ID,
                     aws_secret_access_key=SECRET_ACCESS_KEY, region_name=REGION)
