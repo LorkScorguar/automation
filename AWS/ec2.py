@@ -61,19 +61,22 @@ def getAmi(verbose,amiId):
     """Simple function to get ami details"""
     dami = {}
     jResp = EC2C.describe_images(ImageIds=[amiId])
-    if 'Platform' in jResp['Images'][0]:
-        platform = jResp['Images'][0]['Platform']
+    if len(jResp['Images']) > 0:
+        if 'Platform' in jResp['Images'][0]:
+            platform = jResp['Images'][0]['Platform']
+        else:
+            platform = ""
+        if verbose:
+            dami[amiId] = jResp['Images'][0]['Name']+";"+\
+                          platform+";"+\
+                          jResp['Images'][0]['Architecture']+";"+\
+                          jResp['Images'][0]['ImageType']+";"+\
+                          jResp['Images'][0]['VirtualizationType']
+        else:
+            dami[amiId] = jResp['Images'][0]['Name']+";"+\
+                          platform
     else:
-        platform = None
-    if verbose:
-        dami[amiId] = jResp['Images'][0]['Name']+";"+\
-                      platform+";"+\
-                      jResp['Images'][0]['Architecture']+";"+\
-                      jResp['Images'][0]['ImageType']+";"+\
-                      jResp['Images'][0]['VirtualizationType']
-    else:
-        dami[amiId] = jResp['Images'][0]['Name']+";"+\
-                      platform
+        dami[amiId] = "Unknown;Unknown"
     return dami
 
 def getInstance(verbose,instanceId):
@@ -147,6 +150,7 @@ def countInstanceByType(verbose):
 def countInstanceByTypeByOS(verbose):
     """Count instances by flavors and by OS"""
     instancesByType = {}
+    dami = {}
     jResp = EC2C.describe_instances()
     for reserv in jResp['Reservations']:
         for instance in reserv['Instances']:
@@ -156,8 +160,13 @@ def countInstanceByTypeByOS(verbose):
                 except:
                     instancesByType[instance['InstanceType']+";"+instance['Platform']] = 1
             else:
-                getAmi(False,instance['ImageId'])
-                break
+                #keep track of already requested ami
+                if instance['ImageId'] in dami:
+                    ami = dami[instance['ImageId']]
+                else:
+                    ami = getAmi(False,instance['ImageId'])
+                    for k, v in ami.items():
+                        dami[k] = v
                 try:
                     instancesByType[instance['InstanceType']+";linux"] += 1
                 except:
