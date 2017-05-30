@@ -92,31 +92,45 @@ def listInstances(verbose):
     """list all ec2 instances"""
     nb = 0
     lserver = {}
+    dami = {}
     jResp = EC2C.describe_instances()
     for reserv in jResp['Reservations']:
         for instance in reserv['Instances']:
-            if verbose:
-                lserver[instance['InstanceId']] = str(instance['InstanceType'])+";"+\
-                                                  str(instance['State']['Name'])+";"+\
-                                                  str(instance['PrivateIpAddress'])+";"+\
-                                                  str(instance['LaunchTime'])+";"
+            if 'Platform' in instance and instance['Platform'] == 'windows':
+                platform = "windows"
+            else:
+                #keep track of already requested ami
+                if instance['ImageId'] in dami:
+                    ami = dami[instance['ImageId']]
+                else:
+                    ami = getAmi(False,instance['ImageId'])
+                    for k, v in ami.items():
+                        dami[k] = v
+                platform = "linux"
+                lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                  'status': instance['State']['Name'],\
+                                                  'platform': platform,\
+                                                  'private_ip': instance['PrivateIpAddress'],\
+                                                  'LaunchTime': instance['LaunchTime']}
                 nb += 1
+            if verbose:
                 try:
                     for tag in instance['Tags']:
                         if tag['Key'] == 'Description':
-                            server += tag['Value']+":"
+                            lserver[instance['InstanceId']].update({'Description':tag['Value']})
                         if tag['Key'] == 'Owner':
-                            server += tag['Value']+":"
+                            lserver[instance['InstanceId']].update({'Owner':tag['Value']})
                         if tag['Key'] == 'ManagedBy':
-                            server += tag['Value']+":"
+                            lserver[instance['InstanceId']].update({'ManagedBy':tag['Value']})
                 except:
                     continue
             else:
                 nb += 1
-                lserver[instance['InstanceId']] = str(instance['InstanceType'])+";"+\
-                                                  str(instance['State']['Name'])+";"+\
-                                                  str(instance['PrivateIpAddress'])+";"+\
-                                                  str(instance['LaunchTime'])
+                lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                  'status': instance['State']['Name'],\
+                                                  'platform': platform,\
+                                                  'private_ip': instance['PrivateIpAddress'],\
+                                                  'LaunchTime': instance['LaunchTime']}
     return lserver
 
 def getUserInstances(verbose,user):
@@ -144,40 +158,24 @@ def getUserInstances(verbose,user):
         print(server)
     print("Found "+str(nb)+" instances")
 
-def countInstanceByType(verbose):
+def countInstanceByType(verbose,dinstances):
     """Count instances by flavors"""
     instancesByType = {}
-    for instance in EC2R.instances.all():
+    for instanceId, details in dinstances.items():
         try:
-            instancesByType[instance.instance_type] += 1
+            instancesByType[details['flavor']] += 1
         except:
-            instancesByType[instance.instance_type] = 1
+            instancesByType[details['flavor']] = 1
     return instancesByType
 
-def countInstanceByTypeByOS(verbose):
+def countInstanceByTypeByOS(verbose,dinstances):
     """Count instances by flavors and by OS"""
     instancesByType = {}
-    dami = {}
-    jResp = EC2C.describe_instances()
-    for reserv in jResp['Reservations']:
-        for instance in reserv['Instances']:
-            if 'Platform' in instance and instance['Platform'] == 'windows':
-                try:
-                    instancesByType[instance['InstanceType']+";"+instance['Platform']] += 1
-                except:
-                    instancesByType[instance['InstanceType']+";"+instance['Platform']] = 1
-            else:
-                #keep track of already requested ami
-                if instance['ImageId'] in dami:
-                    ami = dami[instance['ImageId']]
-                else:
-                    ami = getAmi(False,instance['ImageId'])
-                    for k, v in ami.items():
-                        dami[k] = v
-                try:
-                    instancesByType[instance['InstanceType']+";linux"] += 1
-                except:
-                    instancesByType[instance['InstanceType']+";linux"] = 1
+    for instanceId, details in dinstances.items():
+        try:
+            instancesByType[details['flavor']+";"+details['platform']] += 1
+        except:
+            instancesByType[details['flavor']+";"+details['platform']] = 1
     return instancesByType
 
 def startInstance(instanceID):
@@ -223,13 +221,18 @@ def getReservedInstances(verbose):
                 lres[reserved['InstanceType']+";"+os] = str(reserved['InstanceCount'])
     return lres
 
-def optimizeReservation():
+def optimizeReservation(verbose):
     """Try to optimize reservations
     + check if reservation are fully used/partially or not at all
-    - check if reservation is needed for a flavor due to instances usage
+    + check if reservation is needed for a flavor due to instances usage (based on 6months)
     - provide price drop estimate"""
+    print("WARNING: As it's not possible to get OS through AWS API, All "\
+          "Linux are reported as Linux (no RedHat, Suse, etc)\n"\
+          "This issue will be address in a future update\n\n")
+    shouldReserved = {}
     dreserved = getReservedInstances(False)
-    count_by_type_os = countInstanceByTypeByOS(False)
+    dinstances = listInstances(False)
+    count_by_type_os = countInstanceByTypeByOS(False, dinstances)
     for typos, nb in count_by_type_os.items():
         if typos in dreserved:
             if int(count_by_type_os[typos]) - int(dreserved[typos]) >= 0:
@@ -240,9 +243,28 @@ def optimizeReservation():
     for typos, nb in dreserved.items():
         if typos not in count_by_type_os:
             print("Reservation is not used for "+typos)
-    print("\nInstances below doesn't have reservation:")
-    for k, v in count_by_type_os.items():
+    #Provide tips for better reservations
+    #Begin by removing instances that have reservation
+    for instanceId in list(dinstances):
+        if dinstances[instanceId]['flavor'] in dreserved:
+            if int(dreserved[dinstances[instanceId]['flavor']]) > 0:
+                dreserved[dinstances[instanceId]['flavor']] -= 1
+                del dinstances[instanceId]
+    today = datetime.datetime.now(datetime.timezone.utc)
+    months6 = today-datetime.timedelta(days=180)
+    for k, v in dinstances.items():
+        if v['LaunchTime'] < months6:
+            try:
+                shouldReserved[v['flavor']+";"+v['platform']] += 1
+            except:
+                shouldReserved[v['flavor']+";"+v['platform']] = 1
+    print("Based on instances older than 6 months, you should buy following reservations:")
+    for k, v in shouldReserved.items():
         print(k+":"+str(v))
+    if verbose:
+        print("\nInstances below doesn't have reservation:")
+        for k, v in count_by_type_os.items():
+            print(k+":"+str(v))
 
 #ELB
 def listElb(verbose):
