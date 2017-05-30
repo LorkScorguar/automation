@@ -181,8 +181,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    #try:
-    if 1:
+    try:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
@@ -230,5 +229,5 @@ if __name__ == '__main__':
             print('\n'.join(resp))
         else:
             parser.print_help()
-    #except:
-    #    parser.print_help()
+    except:
+        parser.print_help()
