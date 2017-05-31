@@ -5,7 +5,8 @@ Must do the following:
 + Count instances by user
 + List all ec2 instances with info
 + Stop/Start Instances
-- List what reservation could be made to optimize cost
++ List what reservation could be made to optimize cost
+- List flavor upgradesavailable
 
 - EC2:Volumes
 + List old unused volumes
@@ -113,15 +114,18 @@ if __name__ == '__main__':
                         default=False, help='List all ec2 instances')
     parser.add_argument('-lr', '--list-rds', action='store_true',
                         default=False, help='List all RDS instances')
+    parser.add_argument('-oc', '--optimize-reservations', action='store_true',
+                        default=False,
+                        help='List what reservations could be done based on last 6 months')
+    parser.add_argument('-ov', '--old-volumes', action='store_true',
+                        default=False,
+                        help='Get a list of volumes that are older than 30 days and unused')
     parser.add_argument('--start-instance', action='store', dest='StartInstanceID',
                         metavar='<instanceId>', default=False, help='Start the specified instance')
     parser.add_argument('--stop-instance', action='store', dest='StopInstanceID',
                         metavar='<instanceId>', default=False, help='Stop the specified instance')
     parser.add_argument('-ta', '--trusted-advisor', action='store_true',
                         default=False, help='Get advice from Trusted Advisor service')
-    parser.add_argument('-ov', '--old-volumes', action='store_true',
-                        default=False,
-                        help='Get a list of volumes that are older than 30 days and unused')
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
@@ -161,6 +165,11 @@ if __name__ == '__main__':
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
+        elif dargs.optimize_reservations:
+            ec2.optimizeReservation(VERBOSE)
+        elif dargs.old_volumes:
+            resp = ec2.getOldUnusedVols(VERBOSE)
+            print('\n'.join(resp))
         elif dargs.StartInstanceID:
             ec2.startInstance(dargs.StartInstanceID)
         elif dargs.StopInstanceID:
@@ -168,9 +177,6 @@ if __name__ == '__main__':
         elif dargs.trusted_advisor:
             resp = getAdvise(VERBOSE)
             print(resp)
-        elif dargs.old_volumes:
-            resp = ec2.getOldUnusedVols(VERBOSE)
-            print('\n'.join(resp))
         else:
             parser.print_help()
     except:
