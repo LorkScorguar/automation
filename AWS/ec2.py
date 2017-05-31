@@ -301,6 +301,7 @@ def optimizeReservation(verbose):
     shouldReserved = {}
     dreserved = getReservedInstances(False)
     dinstances = listInstances(False)
+    dflavors = getInstanceTypes("eu-west-1")
     count_by_type_os = countInstanceByTypeByOS(False, dinstances)
     for typos, nb in count_by_type_os.items():
         if typos in dreserved:
@@ -327,9 +328,14 @@ def optimizeReservation(verbose):
                 shouldReserved[v['flavor']+";"+v['platform']] += 1
             except:
                 shouldReserved[v['flavor']+";"+v['platform']] = 1
-    print("Based on instances older than 6 months, you should buy following reservations:")
+    print("\nBased on instances older than 6 months, you should buy following reservations:")
+    saveno, savepa = 0, 0
     for k, v in shouldReserved.items():
         print(k+":"+str(v))
+        saveno += (float(dflavors[k]['ondemand']) - float(dflavors[k]['reserved1yno'])) * v
+        savepa += (float(dflavors[k]['ondemand']) - float(dflavors[k]['reserved1ypa'])) * v
+    print("You can save up to "+str(saveno)+"$/month with no upfront reservation")
+    print("You can save up to "+str(savepa)+"$/month with partial upfront reservation")
     if verbose:
         print("\nInstances below doesn't have reservation:")
         for k, v in count_by_type_os.items():
