@@ -301,7 +301,7 @@ def optimizeReservation(verbose):
     shouldReserved = {}
     dreserved = getReservedInstances(False)
     dinstances = listInstances(False)
-    dflavors = getInstanceTypes("eu-west-1")
+    dflavors = getInstanceTypes(REGION)
     count_by_type_os = countInstanceByTypeByOS(False, dinstances)
     for typos, nb in count_by_type_os.items():
         if typos in dreserved:
