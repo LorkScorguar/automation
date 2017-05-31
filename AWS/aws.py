@@ -29,10 +29,6 @@ Must do the following:
 """
 
 import os
-import re
-import urllib.request
-import ssl
-from collections import OrderedDict
 import argparse
 
 import boto3
@@ -88,58 +84,6 @@ def getAdvise(verbose):
                         else:
                             print(k+":"+k1+":"+it['name'])
     return "You can save up to "+str(totalSavings)+"$"
-
-#OTHER
-def ignoreCertificate():
-    """Simple function to ignore ssl certificate verification"""
-    context = ssl.create_default_context()
-    context.check_hostname = False
-    context.verify_mode = ssl.CERT_NONE
-    return context
-
-def getInstanceTypes():
-    """Parse AWS website to list all instance flavors"""
-    dflavors = {}
-    desc = {"t":"General Purpose",
-            "m":"General Purpose",
-            "c":"Compute Optimized",
-            "x":"Memory Optimized",
-            "r":"Memory Optimized",
-            "p":"GPU Compute",
-            "g":"GPU Instances",
-            "f":"FPGA Instances",
-            "i":"Storage Optimized",
-            "d":"Storage Optimized"}
-    url = "https://aws.amazon.com/ec2/instance-types/"
-    req = urllib.request.Request(url)
-    req.get_method = lambda: 'GET'
-    resp = urllib.request.urlopen(req, context=ignoreCertificate())
-    data = resp.read().decode('utf-8')
-    data = data.split("<h2 id=\"instance-type-matrix\">")[1]
-    data = data.split("""</table>
-         </div>
-        </div>
-        <div class="aws-text-box section">""")[0]
-    array = data.split("<tr>")
-    del array[0]
-    del array[0]
-    for item in array:
-        #remove annoying characters
-        item = item.replace("<br />", "")
-        item = item.replace("</p>", "")
-        try:
-            n = item.split("</td>")[0]
-            name = re.compile("<td.*>").split(n)[1].strip()
-            arr = item.split("</td>")
-            mem = re.compile("<td.*>").split(arr[2])[1].strip()
-            cpu = re.compile("<td.*>").split(arr[1])[1].strip()
-            dflavors[name.replace(".", "_")] = str(name)+" -- "+str(cpu)+\
-                                               " vCPU, "+str(mem)+\
-                                               " GiB RAM -- "+desc[name[0]]
-        except:
-            print(item)
-    res = OrderedDict(sorted(dflavors.items(), key=lambda t: t[0]))
-    return res
 
 if __name__ == '__main__':
     VERBOSE = False

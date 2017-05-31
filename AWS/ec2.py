@@ -4,6 +4,7 @@ Module to manipulate ec2 resources
 import datetime
 import re
 import os
+import json
 import boto3
 import secret
 
@@ -220,6 +221,42 @@ def getReservedInstances(verbose):
                     os = "linux"
                 lres[reserved['InstanceType']+";"+os] = str(reserved['InstanceCount'])
     return lres
+
+def getInstanceTypes(region):
+    """Method to get instance flavor with specs and price"""
+    url = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json"
+    req = urllib.request.Request(url)
+    req.get_method = lambda: 'GET'
+    #resp = urllib.request.urlopen(req, context=ignoreCertificate())
+    #jResp = json.loads(resp.read().decode('utf-8'))
+    jResp = json.loads(open('index-1.json','r').read())
+    dinstances = {}
+    #jResp = json.loads(open('index.json','r').read())
+    for k, v in jResp['products'].items():
+        if v['productFamily'] == 'Compute Instance' and v['attributes']['location'] == aws_region[region]:
+            ondemand = 0
+            reserved1yno = 0
+            reserved1ypa = 0
+            reserved1yto = 0
+            ncpu = v['attributes']['vcpu']
+            nram = v['attributes']['memory']
+            flavor = v['attributes']['instanceType']
+            family = v['attributes']['instanceFamily']
+            if k in jResp['terms']['OnDemand']:
+                ondemand = jResp['terms']['OnDemand'][k][k+"."+price_code['ondemand']]['priceDimensions'][k+"."+price_code['ondemand']+".6YS6EN2CT7"]['pricePerUnit']['USD']
+            if k in jResp['terms']['Reserved']:
+                reserved1yno = jResp['terms']['Reserved'][k][k+"."+price_code['reserved1yno']]['priceDimensions'][k+"."+price_code['reserved1yno']+".6YS6EN2CT7"]['pricePerUnit']['USD']
+                reserved1ypa = jResp['terms']['Reserved'][k][k+"."+price_code['reserved1ypa']]['priceDimensions'][k+"."+price_code['reserved1ypa']+".6YS6EN2CT7"]['pricePerUnit']['USD']
+                reserved1yto = jResp['terms']['Reserved'][k][k+"."+price_code['reserved1yto']]['priceDimensions'][k+"."+price_code['reserved1yto']+".6YS6EN2CT7"]['pricePerUnit']['USD']
+            if flavor not in dinstances.keys():
+                dinstances[flavor] = {'cpu': ncpu,
+                                      'ram': nram,
+                                      'family': family,
+                                      'ondemand': ondemand,
+                                      'reserved1yno': reserved1yno,
+                                      'reserved1ypa': reserved1ypa,
+                                      'reserved1yto': reserved1yto}
+    return dinstances
 
 def optimizeReservation(verbose):
     """Try to optimize reservations
