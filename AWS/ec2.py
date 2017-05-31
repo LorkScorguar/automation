@@ -227,9 +227,8 @@ def getInstanceTypes(region):
     url = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json"
     req = urllib.request.Request(url)
     req.get_method = lambda: 'GET'
-    #resp = urllib.request.urlopen(req, context=ignoreCertificate())
-    #jResp = json.loads(resp.read().decode('utf-8'))
-    jResp = json.loads(open('index-1.json','r').read())
+    resp = urllib.request.urlopen(req, context=ignoreCertificate())
+    jResp = json.loads(resp.read().decode('utf-8'))
     dinstances = {}
     #jResp = json.loads(open('index.json','r').read())
     for k, v in jResp['products'].items():
