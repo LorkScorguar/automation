@@ -5,6 +5,8 @@ import datetime
 import re
 import os
 import json
+import ssl
+import urllib.request
 import boto3
 import secret
 
@@ -25,6 +27,35 @@ SUPPORTC = boto3.client(service_name='support', aws_access_key_id=ACCESS_KEY_ID,
                         aws_secret_access_key=SECRET_ACCESS_KEY, region_name="us-east-1")
 
 DRY = True
+
+aws_region = {"ap-northeast-1": "Asia Pacific (Tokyo)",
+              "ap-northeast-2": "Asia Pacific (Seoul)",
+              "ap-south-1": "Asia Pacific (Mumbai)",
+              "ap-southeast-1": "Asia Pacific (Singapore)",
+              "ap-southeast-2": "Asia Pacific (Sydney)",
+              "eu-west-1":"EU (Ireland)",
+              "eu-west-2": "EU (Londres)",
+              "eu-central-1": "EU (Frankfurt)",
+              "govcloud-us": "AWS GovCloud (US)",
+              "us-east-1": "US East (N. Virginia)",
+              "us-east-2": "US East (Ohio)",
+              "us-west-1": "US West (N. California)",
+              "us-west-2": "US West (Oregon)",
+              }
+price_code = {"ondemand": "JRTCKXETXF",
+              "reserved1yno": "4NA7Y494T4",
+              "reserved1ypa": "HU7G6KETJZ",
+              "reserved1yto": "6QCMYABX3D",
+              "reserved3yno": "BPH4J8HBKS",
+              "reserved3ypa": "38NPMPTW36",
+              "reserved3yto": "NQ3QZPMQV9"}
+
+def ignoreCertificate():
+    """Simple function to ignore ssl certificate verification"""
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    return context
 
 #EC2 Volumes
 def getOldUnusedVols(verbose):
