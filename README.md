@@ -1,6 +1,10 @@
 # Automation
-Some scripts written for HP SA (Server Automation) and HP OO (Operations Orchestration)  
-Those scripts were tested on HP SA 10.0x and HP OO 10.2x and 10.5x
+Some scripts written to automate tasks on:
+ - HPE OO
+ - HPE SA
+ - F5
+ - AWS
+
 
 # AWS
 Simple script to get info from AWS account
@@ -12,7 +16,8 @@ All those functions must return string
 This is needed to avoid having AWS access key walking in the wild  
 
 # HP
-Some scripts to play around HP Server Automation and HP Operations Orchestration
+Some scripts to play around HPE Server Automation (SA) and HPE Operations Orchestration (OO)
+Those scripts were tested on HPE SA 10.0x and HPE OO 10.2x and 10.5x
 
 ## Spin
 The Spin is a low level API to manipulate objects, usefull to debug or solve conflicts in HPSA  
