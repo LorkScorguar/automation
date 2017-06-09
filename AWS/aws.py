@@ -160,7 +160,7 @@ if __name__ == '__main__':
         elif dargs.list_ec2instances:
             resp = ec2.listInstances(VERBOSE)
             for k, v in resp.items():
-                print(k+":"+v)
+                print(k+":"+str(v))
             print("Found "+str(len(resp.keys()))+" instances")
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
