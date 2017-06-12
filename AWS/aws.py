@@ -24,6 +24,7 @@ Must do the following:
 
 - ALL
 + Get Trusted Advisor infos
+- Optimize all: get price saving for old unused volumes
 
 - OTHER
 + Generate list of AWS instance type with description
@@ -140,7 +141,8 @@ if __name__ == '__main__':
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
-            resp = ec2.countInstanceByType(VERBOSE)
+            dinstances = ec2.listInstances(False)
+            resp = ec2.countInstanceByType(VERBOSE,dinstances)
             for k, v in resp.items():
                 print(k+":"+str(v))
         elif dargs.user:
@@ -179,8 +181,9 @@ if __name__ == '__main__':
             saving2, _, _ = rds.getIdleRDS(VERBOSE)
             saving3, _ = ec2.optimizeReservation(VERBOSE)
             saving4, _, _ = ec2.upgradableFlavor(VERBOSE)
-            #old unused volumes
-            print("By following advises from this script you can save up to "+str(saving+saving2+(saving3*24*30)+(saving4*24*30))+"$/month")
+            resp = ec2.getOldUnusedVols(VERBOSE)
+            print("By following advises from this script you can save up to "+\
+                  str(saving+saving2+(saving3*24*30)+(saving4*24*30))+"$/month")
         elif dargs.optimize_flavors:
             _, upgradeList, resp = ec2.upgradableFlavor(VERBOSE)
             print(resp)
