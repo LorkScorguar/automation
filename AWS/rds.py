@@ -48,7 +48,7 @@ def getIdleRDS(verbose):
                     else:
                         lrds.append(rds['metadata'][1])
     print("You can save up to "+str(totalSavings)+"$")
-    return lrds
+    return totalSavings, lrds
 
 def deleteRDS(verbose,instanceId):
     """Delete a RDS instance"""
