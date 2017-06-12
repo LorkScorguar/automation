@@ -258,17 +258,22 @@ def getReservedInstances(verbose):
     return lres
 
 def getInstanceTypes(region):
-    """Method to get instance flavor with specs and price"""
+    """Method to get instance flavor with specs and price
+    Note that price is for shared instance without included license"""
     url = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json"
     req = urllib.request.Request(url)
     req.get_method = lambda: 'GET'
-    resp = urllib.request.urlopen(req, context=ignoreCertificate())
-    jResp = json.loads(resp.read().decode('utf-8'))
-    #jResp = json.loads(open('index-1.json','r').read())
+    #resp = urllib.request.urlopen(req, context=ignoreCertificate())
+    #jResp = json.loads(resp.read().decode('utf-8'))
+    jResp = json.loads(open('index-1.json','r').read())
     dinstances = {}
     #jResp = json.loads(open('index.json','r').read())
     for k, v in jResp['products'].items():
-        if v['productFamily'] == 'Compute Instance' and v['attributes']['location'] == aws_region[region]:
+        if v['productFamily'] == 'Compute Instance'\
+           and v['attributes']['location'] == aws_region[region]\
+           and v['attributes']['tenancy'] == 'Shared'\
+           and (v['attributes']['licenseModel'] == 'Bring your own license'\
+           or v['attributes']['licenseModel'] == 'No License required'):
             ondemand = 0
             reserved1yno = 0
             reserved1ypa = 0
@@ -344,6 +349,49 @@ def optimizeReservation(verbose):
         print("\nInstances below doesn't have reservation:")
         for k, v in count_by_type_os.items():
             print(k+":"+str(v))
+
+def upgradableFlavor(verbose):
+    dinstances = listInstances(False)
+    cbt = countInstanceByTypeByOS(False,dinstances)
+    dflavors = getInstanceTypes("eu-west-1")
+    save = 0
+    dMaxGenFlavors = {}
+    shouldUpgrade = []
+    instanceUpgrade = {}
+    #get max gen for each flavor
+    for k, v in dflavors.items():
+        if k[1].isdigit():
+            if k[0] not in dMaxGenFlavors.keys():
+                dMaxGenFlavors[k[0]] = k[1]
+            else:
+                if k[1] > dMaxGenFlavors[k[0]]:
+                    del dMaxGenFlavors[k[0]]
+                    dMaxGenFlavors[k[0]] = k[1]
+        else:
+            if k[:2] not in dMaxGenFlavors.keys():
+                dMaxGenFlavors[k[:2]] = k[2]
+            else:
+                if k[1] > dMaxGenFlavors[k[:2]]:
+                    del dMaxGenFlavors[k[:2]]
+                    dMaxGenFlavors[k[:2]] = k[2]
+    for k, v in cbt.items():#ajouter gestion des instances commencant par 2 lettres
+        if k[1] < dMaxGenFlavors[k[0]]:
+            try:
+                newFlavor = k.replace(k[1],dMaxGenFlavors[k[0]])
+                save += (float(dflavors[k]['ondemand']) - float(dflavors[newFlavor]['ondemand'])) * v
+                if k not in shouldUpgrade:
+                    shouldUpgrade.append(k.split(";")[0])
+                if verbose:
+                    print(k+" can be upgraded to "+newFlavor)
+            except:
+                print(k+" cant be upgraded")
+    print("By upgrading old flavor to new one you can save up to: "+str(save)+"$/hour")
+    for k, v in dinstances.items():
+        if v['flavor'] in shouldUpgrade:
+            instanceUpgrade[k] = { "from": v['flavor'],
+                                   "to": v['flavor'].replace(v['flavor'][1],dMaxGenFlavors[v['flavor'][0]])
+                                 }
+    return instanceUpgrade
 
 #ELB
 def listElb(verbose):
