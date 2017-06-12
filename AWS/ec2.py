@@ -349,6 +349,7 @@ def optimizeReservation(verbose):
         print("\nInstances below doesn't have reservation:")
         for k, v in count_by_type_os.items():
             print(k+":"+str(v))
+    return saveno
 
 def upgradableFlavor(verbose):
     dinstances = listInstances(False)
@@ -391,7 +392,7 @@ def upgradableFlavor(verbose):
             instanceUpgrade[k] = { "from": v['flavor'],
                                    "to": v['flavor'].replace(v['flavor'][1],dMaxGenFlavors[v['flavor'][0]])
                                  }
-    return instanceUpgrade
+    return save, instanceUpgrade
 
 #ELB
 def listElb(verbose):
@@ -430,14 +431,14 @@ def getIdleELB(verbose):
                                                                     language="en")
             for elb in jResp2['result']['flaggedResources']:
                 if 'No active back-end instances' in elb['metadata']:
-                    linstances = ec2.getElbInstance(False,elb['metadata'][1])
+                    linstances = getElbInstance(False,elb['metadata'][1])
                     if len(linstances) == 0:#if no instances
                         lIdleElb.append(elb['metadata'][1])
                         totalSavings += float(elb['metadata'][3][1:])
                     for instance in linstances:#search if instance still exist
                         haveInstance = True
                         try:
-                            dinstance = ec2.getInstance(False,instance['InstanceId'])
+                            dinstance = getInstance(False,instance['InstanceId'])
                             haveInstance = True
                         except Exception as e:
                             if re.search('InvalidInstanceID.NotFound', str(e)):
@@ -446,7 +447,7 @@ def getIdleELB(verbose):
                             lIdleElb.append(elb['metadata'][1])
                             totalSavings += float(elb['metadata'][3][1:])
     print("You can save up to "+str(totalSavings)+"$")
-    return lIdleElb
+    return totalSavings,lIdleElb
 
 def deleteELB(verbose,elbName):
     """Delete a RDS instance"""
