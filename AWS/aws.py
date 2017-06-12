@@ -6,7 +6,7 @@ Must do the following:
 + List all ec2 instances with info
 + Stop/Start Instances
 + List what reservation could be made to optimize cost
-- List flavor upgradesavailable
++ List flavor upgrades available
 
 - EC2:Volumes
 + List old unused volumes
@@ -84,7 +84,7 @@ def getAdvise(verbose):
                             print(k+":"+k1+":"+it['name']+";"+str(it['savings']))
                         else:
                             print(k+":"+k1+":"+it['name'])
-    return "You can save up to "+str(totalSavings)+"$"
+    return totalSavings, "You can save up to "+str(totalSavings)+"$"
 
 if __name__ == '__main__':
     VERBOSE = False
@@ -114,7 +114,13 @@ if __name__ == '__main__':
                         default=False, help='List all ec2 instances')
     parser.add_argument('-lr', '--list-rds', action='store_true',
                         default=False, help='List all RDS instances')
-    parser.add_argument('-oc', '--optimize-reservations', action='store_true',
+    parser.add_argument('-oa', '--optimize-all', action='store_true',
+                        default=False,
+                        help='List All optimization + save estimation')
+    parser.add_argument('-of', '--optimize-flavors', action='store_true',
+                        default=False,
+                        help='List upgradables instances')
+    parser.add_argument('-or', '--optimize-reservations', action='store_true',
                         default=False,
                         help='List what reservations could be done based on last 6 months')
     parser.add_argument('-ov', '--old-volumes', action='store_true',
@@ -129,7 +135,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    try:
+    #try:
+    if 1:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
@@ -152,10 +159,10 @@ if __name__ == '__main__':
             resp = ec2.getIdleELB(VERBOSE)
             print('\n'.join(resp))
         elif dargs.idle_rds:
-            resp = rds.getIdleRDS(VERBOSE)
+            saving, resp = rds.getIdleRDS(VERBOSE)
             print('\n'.join(resp))
         elif dargs.list_elb:
-            resp = ec2.listElb(VERBOSE)
+            saving, resp = ec2.listElb(VERBOSE)
             print('\n'.join(resp))
         elif dargs.list_ec2instances:
             resp = ec2.listInstances(VERBOSE)
@@ -165,8 +172,18 @@ if __name__ == '__main__':
         elif dargs.list_rds:
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
+        elif dargs.optimize_all:
+            saving, _ = ec2.getIdleELB(VERBOSE)
+            saving2, _ = rds.getIdleRDS(VERBOSE)
+            saving3 = ec2.optimizeReservation(VERBOSE)
+            saving4, _ = ec2.upgradableFlavor(VERBOSE)
+            saving5, _ = getAdvise(VERBOSE)
+            #old unused volumes
+            print("By following advises from this script you can save up to"+str(saving+saving2+saving3+(saving4*24*30)+saving5))
+        elif dargs.optimize_flavors:
+            _, resp = ec2.upgradableFlavor(VERBOSE)
         elif dargs.optimize_reservations:
-            ec2.optimizeReservation(VERBOSE)
+            _, resp = ec2.optimizeReservation(VERBOSE)
         elif dargs.old_volumes:
             resp = ec2.getOldUnusedVols(VERBOSE)
             print('\n'.join(resp))
@@ -175,9 +192,9 @@ if __name__ == '__main__':
         elif dargs.StopInstanceID:
             ec2.stopInstance(dargs.StopInstanceID)
         elif dargs.trusted_advisor:
-            resp = getAdvise(VERBOSE)
+            _, resp = getAdvise(VERBOSE)
             print(resp)
         else:
             parser.print_help()
-    except:
-        parser.print_help()
+    #except:
+    #    parser.print_help()
