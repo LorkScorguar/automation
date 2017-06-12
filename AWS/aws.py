@@ -67,24 +67,25 @@ def getAdvise(verbose):
         except:
             dcategory[jResp2['result']['status']] = [ditem]
         dreport[check['category']] = dcategory
+    resp = ""
     if verbose:
         for k, v in dreport.items():
             for k1, v1 in v.items():
                 for it in v1:
                     if 'savings' in it:
-                        print(k+":"+k1+":"+it['name']+";"+str(it['savings']))
+                        resp += k+":"+k1+":"+it['name']+";"+str(it['savings'])+"\n"
                     else:
-                        print(k+":"+k1+":"+it['name'])
+                        resp += k+":"+k1+":"+it['name']+"\n"
     else:
         for k, v in dreport.items():
             for k1, v1 in v.items():
                 if k1 == 'error':
                     for it in v1:
                         if 'savings' in it:
-                            print(k+":"+k1+":"+it['name']+";"+str(it['savings']))
+                            resp += k+":"+k1+":"+it['name']+";"+str(it['savings'])+"\n"
                         else:
-                            print(k+":"+k1+":"+it['name'])
-    return totalSavings, "You can save up to "+str(totalSavings)+"$"
+                            resp += k+":"+k1+":"+it['name']+"\n"
+    return totalSavings,resp, "You can save up to "+str(totalSavings)+"$"
 
 if __name__ == '__main__':
     VERBOSE = False
@@ -135,8 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    #try:
-    if 1:
+    try:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
@@ -156,11 +156,13 @@ if __name__ == '__main__':
             for flavorName, details  in resp.items():
                 print(flavorName+":"+details)
         elif dargs.idle_elb:
-            resp = ec2.getIdleELB(VERBOSE)
-            print('\n'.join(resp))
+            saving, elbList, resp = ec2.getIdleELB(VERBOSE)
+            print('\n'.join(elbList))
+            print(resp)
         elif dargs.idle_rds:
-            saving, resp = rds.getIdleRDS(VERBOSE)
-            print('\n'.join(resp))
+            saving, rdsList, resp = rds.getIdleRDS(VERBOSE)
+            print('\n'.join(rdsList))
+            print("\n"+resp)
         elif dargs.list_elb:
             saving, resp = ec2.listElb(VERBOSE)
             print('\n'.join(resp))
@@ -173,17 +175,18 @@ if __name__ == '__main__':
             resp = rds.listRds(VERBOSE)
             print('\n'.join(resp))
         elif dargs.optimize_all:
-            saving, _ = ec2.getIdleELB(VERBOSE)
-            saving2, _ = rds.getIdleRDS(VERBOSE)
-            saving3 = ec2.optimizeReservation(VERBOSE)
-            saving4, _ = ec2.upgradableFlavor(VERBOSE)
-            saving5, _ = getAdvise(VERBOSE)
+            saving, _, _ = ec2.getIdleELB(VERBOSE)
+            saving2, _, _ = rds.getIdleRDS(VERBOSE)
+            saving3, _ = ec2.optimizeReservation(VERBOSE)
+            saving4, _, _ = ec2.upgradableFlavor(VERBOSE)
             #old unused volumes
-            print("By following advises from this script you can save up to"+str(saving+saving2+saving3+(saving4*24*30)+saving5))
+            print("By following advises from this script you can save up to "+str(saving+saving2+(saving3*24*30)+(saving4*24*30))+"$/month")
         elif dargs.optimize_flavors:
-            _, resp = ec2.upgradableFlavor(VERBOSE)
+            _, upgradeList, resp = ec2.upgradableFlavor(VERBOSE)
+            print(resp)
         elif dargs.optimize_reservations:
             _, resp = ec2.optimizeReservation(VERBOSE)
+            print(resp)
         elif dargs.old_volumes:
             resp = ec2.getOldUnusedVols(VERBOSE)
             print('\n'.join(resp))
@@ -192,9 +195,9 @@ if __name__ == '__main__':
         elif dargs.StopInstanceID:
             ec2.stopInstance(dargs.StopInstanceID)
         elif dargs.trusted_advisor:
-            _, resp = getAdvise(VERBOSE)
+            _, details, resp = getAdvise(VERBOSE)
             print(resp)
         else:
             parser.print_help()
-    #except:
-    #    parser.print_help()
+    except:
+        parser.print_help()

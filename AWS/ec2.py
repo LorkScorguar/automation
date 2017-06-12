@@ -312,16 +312,17 @@ def optimizeReservation(verbose):
     dinstances = listInstances(False)
     dflavors = getInstanceTypes("eu-west-1")
     count_by_type_os = countInstanceByTypeByOS(False, dinstances)
+    resp = ""
     for typos, nb in count_by_type_os.items():
         if typos in dreserved:
             if int(count_by_type_os[typos]) - int(dreserved[typos]) >= 0:
                 count_by_type_os[typos] = int(count_by_type_os[typos]) - int(dreserved[typos])
-                print("Reservation fully used for "+typos)
+                resp += "Reservation fully used for "+typos+"\n"
             else:
                 print("Reservation not fully used for "+typos+": "+dreserved[typos]+"reserved but only "+count_by_type_os[typos]+" instances")
     for typos, nb in dreserved.items():
         if typos not in count_by_type_os:
-            print("Reservation is not used for "+typos)
+            resp += "Reservation is not used for "+typos+"\n"
     #Provide tips for better reservations
     #Begin by removing instances that have reservation
     for instanceId in list(dinstances):
@@ -337,19 +338,19 @@ def optimizeReservation(verbose):
                 shouldReserved[v['flavor']+";"+v['platform']] += 1
             except:
                 shouldReserved[v['flavor']+";"+v['platform']] = 1
-    print("\nBased on instances older than 6 months, you should buy following reservations:")
+    resp += "\nBased on instances older than 6 months, you should buy following reservations:\n"
     saveno, savepa = 0, 0
     for k, v in shouldReserved.items():
-        print(k+":"+str(v))
+        resp += k+":"+str(v)+"\n"
         saveno += (float(dflavors[k]['ondemand']) - float(dflavors[k]['reserved1yno'])) * v
         savepa += (float(dflavors[k]['ondemand']) - float(dflavors[k]['reserved1ypa'])) * v
-    print("You can save up to "+str(saveno)+"$/hour with no upfront reservation")
-    print("You can save up to "+str(savepa)+"$/hour with partial upfront reservation")
+    resp += "You can save up to "+str(saveno)+"$/hour with no upfront reservation\n"
+    resp += "You can save up to "+str(savepa)+"$/hour with partial upfront reservation\n"
     if verbose:
-        print("\nInstances below doesn't have reservation:")
+        resp += "\nInstances below doesn't have reservation:\n"
         for k, v in count_by_type_os.items():
-            print(k+":"+str(v))
-    return saveno
+            resp += k+":"+str(v)+"\n"
+    return saveno, resp
 
 def upgradableFlavor(verbose):
     dinstances = listInstances(False)
@@ -359,6 +360,7 @@ def upgradableFlavor(verbose):
     dMaxGenFlavors = {}
     shouldUpgrade = []
     instanceUpgrade = {}
+    resp = ""
     #get max gen for each flavor
     for k, v in dflavors.items():
         if k[1].isdigit():
@@ -383,16 +385,16 @@ def upgradableFlavor(verbose):
                 if k not in shouldUpgrade:
                     shouldUpgrade.append(k.split(";")[0])
                 if verbose:
-                    print(k+" can be upgraded to "+newFlavor)
+                    resp += k+" can be upgraded to "+newFlavor+"\n"
             except:
-                print(k+" cant be upgraded")
-    print("By upgrading old flavor to new one you can save up to: "+str(save)+"$/hour")
+                resp += k+" cant be upgraded\n"
+    resp += "By upgrading old flavor to new one you can save up to: "+str(save)+"$/hour\n"
     for k, v in dinstances.items():
         if v['flavor'] in shouldUpgrade:
             instanceUpgrade[k] = { "from": v['flavor'],
                                    "to": v['flavor'].replace(v['flavor'][1],dMaxGenFlavors[v['flavor'][0]])
                                  }
-    return save, instanceUpgrade
+    return save, instanceUpgrade, resp
 
 #ELB
 def listElb(verbose):
@@ -446,8 +448,8 @@ def getIdleELB(verbose):
                         if not haveInstance:
                             lIdleElb.append(elb['metadata'][1])
                             totalSavings += float(elb['metadata'][3][1:])
-    print("You can save up to "+str(totalSavings)+"$")
-    return totalSavings,lIdleElb
+    resp = "You can save up to "+str(totalSavings)+"$"
+    return totalSavings, lIdleElb, resp
 
 def deleteELB(verbose,elbName):
     """Delete a RDS instance"""
