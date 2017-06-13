@@ -60,7 +60,7 @@ def ignoreCertificate():
 #EC2 Volumes
 def getOldUnusedVols(verbose):
     """Get List of volumes that are available and 30 days old at least"""
-    res = []
+    res = {}
     ec2volumes = EC2C.describe_volumes(Filters=[
         {
             'Name': 'status',
@@ -75,22 +75,22 @@ def getOldUnusedVols(verbose):
         if not 'Tags' in vol:
             if vol['CreateTime'] < days30:
                 if verbose:
-                    res.append(vol['VolumeId']+";"+str(vol['CreateTime']))
+                    res[vol['VolumeId']] = str(vol['CreateTime'])+";"+str(vol['Size'])+";"+str(vol['VolumeType'])
                 else:
-                    res.append(vol['VolumeId'])
+                    res[vol['VolumeId']] = str(vol['CreateTime'])
     return res
 
 def cleanupOldUnusedVols(verbose):
     """Delete old unused volumes"""
     lvol = getOldUnusedVols(False)
-    for vol in lvol:
+    for k, v in lvol.items():
         resp = EC2C.delete_volume(
         DryRun = DRY,
-        VolumeId = vol
+        VolumeId = k
         )
         if verbose:
-            print("Volume with id: "+vol+" deleted")
-    print("Delete "+str(len(lvol))+" volumes")
+            print("Volume with id: "+k+" deleted")
+    print("Delete "+str(len(lvol.keys()))+" volumes")
 
 #EC2 Instances
 def getAmi(verbose,amiId):

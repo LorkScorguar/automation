@@ -192,7 +192,8 @@ if __name__ == '__main__':
             print(resp)
         elif dargs.old_volumes:
             resp = ec2.getOldUnusedVols(VERBOSE)
-            print('\n'.join(resp))
+            for k, v in resp.items():
+                print(k+":"+v)
         elif dargs.StartInstanceID:
             ec2.startInstance(dargs.StartInstanceID)
         elif dargs.StopInstanceID:
