@@ -58,6 +58,26 @@ def ignoreCertificate():
     return context
 
 #EC2 Volumes
+def getVolumePrices(region):
+    """Method to get volume prices"""
+    url = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json"
+    req = urllib.request.Request(url)
+    req.get_method = lambda: 'GET'
+    resp = urllib.request.urlopen(req, context=ignoreCertificate())
+    jResp = json.loads(resp.read().decode('utf-8'))
+    dvolumes = {}
+    for k, v in jResp['products'].items():
+        if v['productFamily'] == 'Storage'\
+           and v['attributes']['location'] == aws_region[region]:
+           if k in jResp['terms']['OnDemand']:
+               price = jResp['terms']['OnDemand'][k][k+"."+price_code['ondemand']]['priceDimensions'][k+"."+price_code['ondemand']+".6YS6EN2CT7"]['pricePerUnit']['USD']
+               try:
+                   vtype = v['attributes']['usagetype'].split(".")[1]
+               except:
+                   vtype="magnetic"
+               dvolumes[vtype] = price
+    return dvolumes
+
 def getOldUnusedVols(verbose):
     """Get List of volumes that are available and 30 days old at least"""
     res = {}
