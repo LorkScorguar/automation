@@ -185,15 +185,15 @@ if __name__ == '__main__':
             print("By following advises from this script you can save up to "+\
                   str(saving+saving2+(saving3*24*30)+(saving4*24*30)+saving5)+"$/month")
         elif dargs.optimize_flavors:
-            _, upgradeList, resp = ec2.upgradableFlavor(VERBOSE)
+            _, upgradeList, resp = ec2.upgradableFlavor(VERBOSE,REGION)
             print(resp)
         elif dargs.optimize_reservations:
-            _, resp = ec2.optimizeReservation(VERBOSE)
+            _, resp = ec2.optimizeReservation(VERBOSE,REGION)
             print(resp)
         elif dargs.old_volumes:
-            _, resp = ec2.getOldUnusedVols(VERBOSE)
+            _, resp = ec2.getOldUnusedVols(VERBOSE,REGION)
             for k, v in resp.items():
-                print(k+":"+v)
+                print(k+":"+str(v))
         elif dargs.StartInstanceID:
             ec2.startInstance(dargs.StartInstanceID)
         elif dargs.StopInstanceID:

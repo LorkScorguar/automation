@@ -318,7 +318,7 @@ def getInstanceTypes(region):
                                       'reserved1yto': reserved1yto}
     return dinstances
 
-def optimizeReservation(verbose):
+def optimizeReservation(verbose,region):
     """Try to optimize reservations
     + check if reservation are fully used/partially or not at all
     + check if reservation is needed for a flavor due to instances usage (based on 6months)
@@ -329,7 +329,7 @@ def optimizeReservation(verbose):
     shouldReserved = {}
     dreserved = getReservedInstances(False)
     dinstances = listInstances(False)
-    dflavors = getInstanceTypes("eu-west-1")
+    dflavors = getInstanceTypes(region)
     count_by_type_os = countInstanceByTypeByOS(False, dinstances)
     resp = ""
     for typos, nb in count_by_type_os.items():
@@ -371,10 +371,10 @@ def optimizeReservation(verbose):
             resp += k+":"+str(v)+"\n"
     return saveno, resp
 
-def upgradableFlavor(verbose):
+def upgradableFlavor(verbose,region):
     dinstances = listInstances(False)
     cbt = countInstanceByTypeByOS(False,dinstances)
-    dflavors = getInstanceTypes("eu-west-1")
+    dflavors = getInstanceTypes(region)
     save = 0
     dMaxGenFlavors = {}
     shouldUpgrade = []
