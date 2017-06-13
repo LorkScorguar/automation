@@ -74,14 +74,15 @@ def getVolumePrices(region):
                try:
                    vtype = v['attributes']['usagetype'].split(".")[1]
                except:
-                   vtype="magnetic"
+                   vtype="standard"
                dvolumes[vtype] = price
     return dvolumes
 
-def getOldUnusedVols(verbose):
+def getOldUnusedVols(verbose,region):
     """Get List of volumes that are available and 30 days old at least"""
     res = {}
-    saving = 0
+    savings = 0
+    dvolumes = getVolumePrices(region)
     ec2volumes = EC2C.describe_volumes(Filters=[
         {
             'Name': 'status',
@@ -99,7 +100,8 @@ def getOldUnusedVols(verbose):
                     res[vol['VolumeId']] = str(vol['CreateTime'])+";"+str(vol['Size'])+";"+str(vol['VolumeType'])
                 else:
                     res[vol['VolumeId']] = str(vol['CreateTime'])
-    return saving, res
+                savings += float(vol['Size'] * float(dvolumes[vol['VolumeType']]))
+    return savings, res
 
 def cleanupOldUnusedVols(verbose):
     """Delete old unused volumes"""

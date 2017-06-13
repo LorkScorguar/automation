@@ -24,7 +24,7 @@ Must do the following:
 
 - ALL
 + Get Trusted Advisor infos
-- Optimize all: get price saving for old unused volumes
++ Optimize all
 
 - OTHER
 + Generate list of AWS instance type with description
@@ -137,7 +137,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    try:
+    #try:
+    if 1:
         if dargs.verbose:
             VERBOSE = True
         if dargs.count_by_type:
@@ -178,10 +179,15 @@ if __name__ == '__main__':
             print('\n'.join(resp))
         elif dargs.optimize_all:
             saving, _, _ = ec2.getIdleELB(VERBOSE)
+            print("Save "+str(saving)+"$ by removing idle ELB")
             saving2, _, _ = rds.getIdleRDS(VERBOSE)
-            saving3, _ = ec2.optimizeReservation(VERBOSE)
-            saving4, _, _ = ec2.upgradableFlavor(VERBOSE)
-            saving5, _ = ec2.getOldUnusedVols(VERBOSE)
+            print("Save "+str(saving2)+"$ by removing idle RDS")
+            saving3, _ = ec2.optimizeReservation(VERBOSE,REGION)
+            print("Save "+str(saving3*24*30)+"$ by optimizing reservations")
+            saving4, _, _ = ec2.upgradableFlavor(VERBOSE,REGION)
+            print("Save "+str(saving4*24*30)+"$ by upgrading flavors")
+            saving5, _ = ec2.getOldUnusedVols(VERBOSE,REGION)
+            print("Save "+str(saving5)+"$ by removing unused volumes")
             print("By following advises from this script you can save up to "+\
                   str(saving+saving2+(saving3*24*30)+(saving4*24*30)+saving5)+"$/month")
         elif dargs.optimize_flavors:
@@ -203,5 +209,5 @@ if __name__ == '__main__':
             print(resp)
         else:
             parser.print_help()
-    except:
-        parser.print_help()
+    #except:
+    #    parser.print_help()
