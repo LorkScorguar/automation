@@ -82,8 +82,8 @@ def getOldUnusedVols(verbose):
 
 def cleanupOldUnusedVols(verbose):
     """Delete old unused volumes"""
-    lvol = getOldUnusedVols(False)
-    for k, v in lvol.items():
+    _, dvol = getOldUnusedVols(False)
+    for k, v in dvol.items():
         resp = EC2C.delete_volume(
         DryRun = DRY,
         VolumeId = k

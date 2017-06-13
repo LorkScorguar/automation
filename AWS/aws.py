@@ -181,9 +181,9 @@ if __name__ == '__main__':
             saving2, _, _ = rds.getIdleRDS(VERBOSE)
             saving3, _ = ec2.optimizeReservation(VERBOSE)
             saving4, _, _ = ec2.upgradableFlavor(VERBOSE)
-            resp = ec2.getOldUnusedVols(VERBOSE)
+            saving5, _ = ec2.getOldUnusedVols(VERBOSE)
             print("By following advises from this script you can save up to "+\
-                  str(saving+saving2+(saving3*24*30)+(saving4*24*30))+"$/month")
+                  str(saving+saving2+(saving3*24*30)+(saving4*24*30)+saving5)+"$/month")
         elif dargs.optimize_flavors:
             _, upgradeList, resp = ec2.upgradableFlavor(VERBOSE)
             print(resp)
@@ -191,7 +191,7 @@ if __name__ == '__main__':
             _, resp = ec2.optimizeReservation(VERBOSE)
             print(resp)
         elif dargs.old_volumes:
-            resp = ec2.getOldUnusedVols(VERBOSE)
+            _, resp = ec2.getOldUnusedVols(VERBOSE)
             for k, v in resp.items():
                 print(k+":"+v)
         elif dargs.StartInstanceID:
