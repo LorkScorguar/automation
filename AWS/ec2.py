@@ -61,6 +61,7 @@ def ignoreCertificate():
 def getOldUnusedVols(verbose):
     """Get List of volumes that are available and 30 days old at least"""
     res = {}
+    saving = 0
     ec2volumes = EC2C.describe_volumes(Filters=[
         {
             'Name': 'status',
@@ -78,7 +79,7 @@ def getOldUnusedVols(verbose):
                     res[vol['VolumeId']] = str(vol['CreateTime'])+";"+str(vol['Size'])+";"+str(vol['VolumeType'])
                 else:
                     res[vol['VolumeId']] = str(vol['CreateTime'])
-    return res
+    return saving, res
 
 def cleanupOldUnusedVols(verbose):
     """Delete old unused volumes"""
