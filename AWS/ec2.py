@@ -1,5 +1,7 @@
 """
 Module to manipulate ec2 resources
+
+TODO
 """
 import datetime
 import re
@@ -58,6 +60,16 @@ def ignoreCertificate():
     return context
 
 #EC2 Volumes
+def getVolDetails(verbose,region,volid):
+    """Get details for a specific volume"""
+    res = {}
+    ec2volumes = EC2C.describe_volumes(VolumeIds=[volid])
+    if verbose:
+        res[vol['VolumeId']] = str(vol['CreateTime'])+";"+str(vol['Size'])+";"+str(vol['VolumeType'])
+    else:
+        res[vol['VolumeId']] = str(vol['CreateTime'])
+    return res
+
 def getVolumePrices(region):
     """Method to get volume prices"""
     url = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json"
@@ -170,7 +182,7 @@ def listInstances(verbose):
                                                   'status': instance['State']['Name'],\
                                                   'platform': platform,\
                                                   'private_ip': ip,\
-                                                  'LaunchTime': instance['LaunchTime']}
+                                                  'LaunchTime': instance['Attachment']['AttachTime']}
                 nb += 1
             if verbose:
                 try:
@@ -189,7 +201,7 @@ def listInstances(verbose):
                                                   'status': instance['State']['Name'],\
                                                   'platform': platform,\
                                                   'private_ip': ip,\
-                                                  'LaunchTime': instance['LaunchTime']}
+                                                  'LaunchTime': instance['Attachment']['AttachTime']}
     return lserver
 
 def getUserInstances(verbose,user):
