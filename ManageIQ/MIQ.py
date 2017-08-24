@@ -27,12 +27,14 @@ import argparse
 
 
 def auth():
+    """Get auth infos and generate base64 string"""
     user=input("Enter your username: ")
     password=getpass.getpass("Enter password for " +user+": ")
     authValue=base64.b64encode(bytes(user+":"+password,'utf-8')).decode('utf-8')
     return "Basic "+authValue
 
 def ignoreCertificate():
+    """Function to ignore ssl certificate error"""
     context = ssl.create_default_context()
     context.check_hostname=False
     context.verify_mode = ssl.CERT_NONE
@@ -68,9 +70,10 @@ def checkServiceExist(authValue,miqurl,serviceName,serviceType):
     return exist,service_id
 
 def addService(authValue,miqurl,jinputs):
+    """Allow to order a service from the first catalog"""
     jinputs2={"auto_approve":"true","user_name":"admin"}
     data={"action":"order","resource":jinputs,"requester":jinputs2}
-    req=urllib.request.Request(miqurl+"/service_catalogs/2/service_templates")
+    req=urllib.request.Request(miqurl+"/service_catalogs/1/service_templates")
     req.add_header("content-type", "application/json")
     req.add_header("Authorization", authValue)
     req.get_method=lambda:'POST'
@@ -81,6 +84,7 @@ def addService(authValue,miqurl,jinputs):
     return jResp,service_id
 
 def callFunction(authValue,miqurl,namespace,classe,functionName):
+    """Allow you to call a method in automate"""
     jinputs={"namespace":namespace,"class":classe,"instance":functionName}
     jinputs2={"auto_approve":"true","user_name":"admin"}
     data={"version":"1.1","parameters":{"mode":"debug"},"uri_parts":jinputs,"requester":jinputs2}
@@ -107,7 +111,6 @@ def listVMS(authValue,miqurl):
         jResp=json.loads(resp.read().decode('utf-8'))
         total=jResp['count']
         for item in jResp['resources']:
-            mem=item['hardware']['memory_mb']
             print(str(item['name'])+" "+str(item['hardware']['cpu_total_cores'])+" "+str(item['hardware']['memory_mb']))
         nb=nb+jResp['subcount']
     return 'ok'
