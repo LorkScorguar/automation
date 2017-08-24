@@ -367,7 +367,8 @@ if __name__=="__main__":
     parser.add_argument('-v','--version', action='store_true', default=False, help='Return ManageIQ Automate Version')
     dargs=parser.parse_args()
     authValue=auth()
-    try:
+    #try:
+    if 1:
         branch="origin/master"
         miqurl="https://fqdn/api"
         if dargs.jinputs:
@@ -379,7 +380,7 @@ if __name__=="__main__":
         elif dargs.requestID_approve:
             resp = updateApproval(authValue,miqurl,dargs.requestID_approve,'approve')
             print(resp)
-        elif dargs.function:
+        elif dargs.functionName:
             tmp=dargs.function.split("/")
             functionName=tmp[-1]
             classe=tmp[-2]
@@ -407,5 +408,5 @@ if __name__=="__main__":
             print(version)
         else:
             parser.print_help()
-    except:
-        parser.print_help()
+    #except:
+    #    parser.print_help()
