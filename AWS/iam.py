@@ -62,4 +62,11 @@ def checkKeys(verbose):
                 age=(today-ac['createdDate']).days
                 print("Access key "+ac['accessKeyId']+" for user "+k+" is old ("+str(age)+" days)")
 
-def generateKey(verbose,user)
+def generateKey(verbose,user):
+    """Generate a new pair of access_key/secret_access_key for a user"""
+    jResp = IAMC.create_access_key(UserName=user)
+    return accessKeyId,secretAccessKey
+
+def deleteKey(verbose,user,accessKeyId):
+    """Delete an access_key for a user"""
+    jResp = IAMC.delete_access_key(UserName=user,AccessKeyId=accessKeyId)
