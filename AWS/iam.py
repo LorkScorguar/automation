@@ -25,7 +25,7 @@ IAMC = boto3.client(service_name='iam', aws_access_key_id=ACCESS_KEY_ID,
 
 DRY = True
 
-def getUsers(verbose,region):
+def getUsers(verbose):
     """Get List of users"""
     res = []
     jResp=IAMC.list_users()
@@ -33,7 +33,7 @@ def getUsers(verbose,region):
         res.append(user['UserName'])
     return res
 
-def checkKeyForUser(verbose,region,user):
+def checkKeyForUser(verbose,user):
     """Get list of access_key for a user"""
     res = {}
     jResp=IAMC.list_access_keys(
@@ -46,12 +46,12 @@ def checkKeyForUser(verbose,region,user):
             res[user]=[{"accessKeyId":ac['AccessKeyId'],"createdDate":ac['CreateDate']}]
     return res
 
-def checkKeys(verbose,region):
+def checkKeys(verbose):
     """Get List of access_key older than 90days"""
     res = {}
-    lusers=getUsers(verbose,region)
+    lusers=getUsers(verbose)
     for user in lusers:
-        r=checkKeyForUser(verbose,region,user)
+        r=checkKeyForUser(verbose,user)
         if user in r:
             res[user]=r[user]
     today = datetime.datetime.now(datetime.timezone.utc)
@@ -61,3 +61,5 @@ def checkKeys(verbose,region):
             if ac['createdDate']<days90:
                 age=(today-ac['createdDate']).days
                 print("Access key "+ac['accessKeyId']+" for user "+k+" is old ("+str(age)+" days)")
+
+def generateKey(verbose,user)

@@ -147,7 +147,7 @@ if __name__ == '__main__':
         if dargs.verbose:
             VERBOSE = True
         if dargs.check_access_key:
-            iam.checkKeys(False,REGION)
+            iam.checkKeys(False)
         elif dargs.count_by_type:
             dinstances = ec2.listInstances(False)
             resp = ec2.countInstanceByType(VERBOSE,dinstances)

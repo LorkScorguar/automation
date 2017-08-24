@@ -14,7 +14,7 @@ import Config
 def reccuring():
     today = datetime.datetime.now(datetime.timezone.utc)
     days90 = today-datetime.timedelta(days=90)
-    dres = iam.checkKeyForUser(False,Config.aws_region,Config.aws_user)
+    dres = iam.checkKeyForUser(False,Config.aws_user)
     for k,v in dres.items():
         for ac in v:
             if ac['createdDate']<days90:
