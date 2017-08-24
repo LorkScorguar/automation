@@ -1,0 +1,8 @@
+aws_user="myuser"
+aws_region="us-west-1"
+aws_access_key="mysuperaccesskey"
+aws_secret_key="mysupersecretaccesskey"
+
+
+http_proxy="http://ip:port"
+https_proxy="https://ip:port"
