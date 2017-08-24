@@ -22,6 +22,9 @@ Must do the following:
 + Get Idle RDS
 + Delete Idle RDS
 
+- IAM
++ List access_key older than 90days
+
 - ALL
 + Get Trusted Advisor infos
 + Optimize all
@@ -36,6 +39,7 @@ import argparse
 import boto3
 import secret
 import ec2
+import iam
 import rds
 
 os.environ["HTTP_PROXY"] = secret.getProxy()
@@ -91,6 +95,8 @@ def getAdvise(verbose):
 if __name__ == '__main__':
     VERBOSE = False
     parser = argparse.ArgumentParser(description="Provide AWS informations using sdk and web site")
+    parser.add_argument('-cak', '--check-access-key', action='store_true',
+                        default=False, help='CHeck old access keys')
     parser.add_argument('-cbt', '--count-by-type', action='store_true',
                         default=False, help='Count ec2 instances for each flavor')
     parser.add_argument('-cbu', '--count-by-user', action='store', dest='user',
@@ -137,11 +143,12 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true',
                         default=False, help='Output will be more verbose')
     dargs = parser.parse_args()
-    #try:
-    if 1:
+    try:
         if dargs.verbose:
             VERBOSE = True
-        if dargs.count_by_type:
+        if dargs.check_access_key:
+            iam.checkKeys(False,REGION)
+        elif dargs.count_by_type:
             dinstances = ec2.listInstances(False)
             resp = ec2.countInstanceByType(VERBOSE,dinstances)
             for k, v in resp.items():
@@ -209,5 +216,5 @@ if __name__ == '__main__':
             print(resp)
         else:
             parser.print_help()
-    #except:
-    #    parser.print_help()
+    except:
+        parser.print_help()

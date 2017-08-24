@@ -46,13 +46,14 @@ def checkKeyForUser(verbose,region,user):
             res[user]=[{"accessKeyId":ac['AccessKeyId'],"createdDate":ac['CreateDate']}]
     return res
 
-def checkKeys(verbose,region,user=""):
+def checkKeys(verbose,region):
     """Get List of access_key older than 90days"""
     res = {}
     lusers=getUsers(verbose,region)
     for user in lusers:
-        res[user]=checkKeyForUser(verbose,region,user)[user]
-        break
+        r=checkKeyForUser(verbose,region,user)
+        if user in r:
+            res[user]=r[user]
     today = datetime.datetime.now(datetime.timezone.utc)
     days90 = today-datetime.timedelta(days=90)
     for k,v in res.items():
@@ -60,5 +61,3 @@ def checkKeys(verbose,region,user=""):
             if ac['createdDate']<days90:
                 age=(today-ac['createdDate']).days
                 print("Access key "+ac['accessKeyId']+" for user "+k+" is old ("+str(age)+" days)")
-
-checkKeys(False,REGION)
