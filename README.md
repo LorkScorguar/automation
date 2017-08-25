@@ -19,6 +19,9 @@ This is needed to avoid having AWS access key walking in the wild
 Some scripts to play around HPE Server Automation (SA) and HPE Operations Orchestration (OO)
 Those scripts were tested on HPE SA 10.0x and HPE OO 10.2x and 10.5x
 
+# ManageIQ
+Some functions to interact with ManageIQ API.  
+
 ## Spin
 The Spin is a low level API to manipulate objects, usefull to debug or solve conflicts in HPSA  
 Spin is available by web on https://< coreIP >:1004 (you need the spin-developper certificate)
@@ -30,3 +33,6 @@ Twist is available by web on https://< coreIP >:1032
 
 # Network
 Some scripts to play with network equipments and automate them
+
+# OVH  
+A simple script to interact with ovh API to enable/disable/view backups
