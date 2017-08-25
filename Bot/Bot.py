@@ -100,4 +100,10 @@ if __name__ == '__main__':
             quitter=True
             e.set()
             a.join()
+        else:
+            try:
+                res=eval(inp)
+            except:
+                res="Received: "+str(inp)
+        print(res)
     print("Bye")
