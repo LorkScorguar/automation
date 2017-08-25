@@ -65,7 +65,7 @@ def checkKeys(verbose):
 def generateKey(verbose,user):
     """Generate a new pair of access_key/secret_access_key for a user"""
     jResp = IAMC.create_access_key(UserName=user)
-    return accessKeyId,secretAccessKey
+    return jResp['AccessKey']['AccessKeyId'],jResp['AccessKey']['secretAccessKey']
 
 def deleteKey(verbose,user,accessKeyId):
     """Delete an access_key for a user"""
