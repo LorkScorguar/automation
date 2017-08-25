@@ -9,6 +9,8 @@ import base64
 import datetime
 import os
 import sys
+import threading
+import time
 sys.path.append("../AWS")
 import iam
 sys.path.append("../ManageIQ")
@@ -39,7 +41,7 @@ def setProxy():
 
 def checkMIQ(authValue,clconfig):
     url=clconfig['url']
-    platform=clconfig['name']
+    platform="Miq "+clconfig['name']
     nb,res=MIQ.checkPendingRequests(authValue,url)
     if nb > 0:
         title="["+platform+"] Awaiting Validations: "+str(nb)
@@ -72,14 +74,30 @@ def checkAWS(user):
                 updateConfig("aws_secret_key",sak)
                 iam.deleteKey(False,user,Config.aws_access_key)
 
-def recurring():
-    #AWS
-    checkAWS(Config.aws_user)
-    #ManageIQ
-    authValue="Basic "+base64.b64encode(bytes(Config.cluser+":"+Config.clpassword,'utf-8')).decode('utf-8')
-    checkMIQ(authValue,Config.clurlppr)
-    checkMIQ(authValue,Config.clurlprd)
+def recurring(id, e, stop):
+    while True:
+        if stop():
+            break
+        #AWS
+        #checkAWS(Config.aws_user)
+        #ManageIQ
+        authValue="Basic "+base64.b64encode(bytes(Config.cluser+":"+Config.clpassword,'utf-8')).decode('utf-8')
+        checkMIQ(authValue,Config.clurlppr)
+        checkMIQ(authValue,Config.clurlprd)
+        e.wait(timeout=10)
+
+
 
 if __name__ == '__main__':
     print("Welcome")
-    recurring()
+    quitter=False
+    e=threading.Event()
+    a=threading.Thread(None,recurring,"recurring",args=(id, e, lambda: quitter))
+    a.start()
+    while not quitter:
+        inp=input(">")
+        if inp=="quit":
+            quitter=True
+            e.set()
+            a.join()
+    print("Bye")
