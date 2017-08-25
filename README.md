@@ -5,6 +5,10 @@ Some scripts written to automate tasks on:
  - F5
  - AWS
 
+## Bot
+This is a little shell bot which can use scripts from other rep to allow user to do actions  
+on differents platforms using chat bot like
+
 
 # AWS
 Simple script to get info from AWS account
