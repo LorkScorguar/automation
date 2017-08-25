@@ -367,8 +367,7 @@ if __name__=="__main__":
     parser.add_argument('-v','--version', action='store_true', default=False, help='Return ManageIQ Automate Version')
     dargs=parser.parse_args()
     authValue=auth()
-    #try:
-    if 1:
+    try:
         branch="origin/master"
         miqurl="https://fqdn/api"
         if dargs.jinputs:
@@ -408,5 +407,5 @@ if __name__=="__main__":
             print(version)
         else:
             parser.print_help()
-    #except:
-    #    parser.print_help()
+    except:
+        parser.print_help()
