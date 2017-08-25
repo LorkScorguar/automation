@@ -84,7 +84,7 @@ def recurring(id, e, stop):
         authValue="Basic "+base64.b64encode(bytes(Config.cluser+":"+Config.clpassword,'utf-8')).decode('utf-8')
         checkMIQ(authValue,Config.clurlppr)
         checkMIQ(authValue,Config.clurlprd)
-        e.wait(timeout=10)
+        e.wait(timeout=600)
 
 
 
