@@ -192,9 +192,11 @@ def checkPendingRequests(authValue,miqurl):
     jResp = json.loads(resp.read().decode('utf-8'))
     nb = 0
     for request in jResp['resources']:
-        if request['request_state'] == 'pending' and request['approval_state'] == 'pending_approval':
-            res+=str(request['id'])+":"+request['description']
-            nb += 1
+        if 'dialog_option_0_instancetype' in request['options']['dialog']:
+            res+=str(request['id'])+":"+request['description']+"-"+request['options']['dialog']['dialog_option_0_instancetype']+":"+request['requester_name']+"\n"
+        else:
+            res+=str(request['id'])+":"+request['description']+"-"+str(request['options']['dialog']['dialog_options_0_cores_per_socket'])+"cpu/"+str(request['options']['dialog']['dialog_options_0_vm_memory'])+"Mo:"+request['requester_name']+"\n"
+        nb += 1
     return nb,res
 
 def setOwnership(authValue,miqurl,serviceID,username,groupname):
