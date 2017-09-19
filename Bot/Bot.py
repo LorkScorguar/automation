@@ -47,6 +47,7 @@ def checkMIQ(authValue,clconfig):
         title="["+platform+"] Awaiting Validations: "+str(nb)
         print(title)
         print(res)
+        print("\n")
         while nb > 0:
             choice = input("Enter action to do (d or a +requestID): ")
             requestID = choice[1:]
@@ -104,6 +105,7 @@ if __name__ == '__main__':
             try:
                 res=eval(inp)
             except:
-                res="Received: "+str(inp)
+                if inp!="":
+                    res="Received: "+str(inp)
         print(res)
     print("Bye")
