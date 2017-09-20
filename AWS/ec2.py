@@ -178,11 +178,18 @@ def listInstances(verbose):
                     for k, v in ami.items():
                         dami[k] = v
                 platform = "linux"
-                lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
-                                                  'status': instance['State']['Name'],\
-                                                  'platform': platform,\
-                                                  'private_ip': ip,\
-                                                  'LaunchTime': instance['Attachment']['AttachTime']}
+                try:
+                    lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                      'status': instance['State']['Name'],\
+                                                      'platform': platform,\
+                                                      'private_ip': ip,\
+                                                      'LaunchTime': instance['BlockDeviceMappings'][0]['Ebs']['AttachTime']}
+                except:
+                    lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                      'status': instance['State']['Name'],\
+                                                      'platform': platform,\
+                                                      'private_ip': ip,\
+                                                      'LaunchTime': instance['LaunchTime']}
                 nb += 1
             if verbose:
                 try:
@@ -197,11 +204,18 @@ def listInstances(verbose):
                     continue
             else:
                 nb += 1
-                lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
-                                                  'status': instance['State']['Name'],\
-                                                  'platform': platform,\
-                                                  'private_ip': ip,\
-                                                  'LaunchTime': instance['Attachment']['AttachTime']}
+                try:
+                    lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                      'status': instance['State']['Name'],\
+                                                      'platform': platform,\
+                                                      'private_ip': ip,\
+                                                      'LaunchTime': instance['BlockDeviceMappings'][0]['Ebs']['AttachTime']}
+                except:
+                    lserver[instance['InstanceId']] = {'flavor': instance['InstanceType'],\
+                                                      'status': instance['State']['Name'],\
+                                                      'platform': platform,\
+                                                      'private_ip': ip,\
+                                                      'LaunchTime': instance['LaunchTime']}
     return lserver
 
 def getUserInstances(verbose,user):
