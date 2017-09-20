@@ -243,6 +243,7 @@ def getUserInstances(verbose,user):
                      str(instance.state['Name'])
         res += str(server)+"\n"
     res += "Found "+str(nb)+" instances"
+    return res
 
 def countInstanceByType(verbose,dinstances):
     """Count instances by flavors"""
