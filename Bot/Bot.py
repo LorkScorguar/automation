@@ -27,7 +27,7 @@ def updateConfig(param,value):
     cfg = open("Config.py","r")
     for line in cfg:
         parm = line.strip().split("=")[0]
-        val  line.strip().split("=")[1]
+        val = line.strip().split("=")[1]
         save[parm] = val
     cfg.close()
     #do the change and write file
