@@ -221,6 +221,7 @@ def listInstances(verbose):
 def getUserInstances(verbose,user):
     """Count number of instances for specific user"""
     nb = 0
+    res = ""
     instances = EC2R.instances.filter(Filters=[{'Name':'tag:Owner', 'Values':[user]}])
     for instance in instances:
         nb += 1
@@ -240,8 +241,8 @@ def getUserInstances(verbose,user):
         else:
             server = str(instance.id)+";"+str(instance.instance_type)+";"+\
                      str(instance.state['Name'])
-        print(server)
-    print("Found "+str(nb)+" instances")
+        res += str(server)+"\n"
+    res += "Found "+str(nb)+" instances"
 
 def countInstanceByType(verbose,dinstances):
     """Count instances by flavors"""

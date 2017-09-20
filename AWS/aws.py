@@ -154,7 +154,8 @@ if __name__ == '__main__':
             for k, v in resp.items():
                 print(k+":"+str(v))
         elif dargs.user:
-            ec2.getUserInstances(VERBOSE,dargs.user)
+            resp = ec2.getUserInstances(VERBOSE,dargs.user)
+            print(resp)
         elif dargs.delete_idle_elb:
             ec2.cleanupELB(VERBOSE)
         elif dargs.delete_idle_rds:
