@@ -8,3 +8,4 @@ clurlppr={"name":"prod","url":"https://cloudformsfqdn/api"}
 clurlprd={"name":"pre-prod","url":"https://cloudformsfqdn/api"}
 cluser="admin"
 clpassword="admin"
+awsverbose=False
