@@ -13,6 +13,7 @@ import sys
 import threading
 import time
 sys.path.append("../AWS")
+import ec2
 import iam
 sys.path.append("../ManageIQ")
 import MIQ
@@ -92,9 +93,20 @@ def analyse(inp):
             action = "approve"
         requestID = inp[1:]
         url = tasks[requestID]
-        resp = MIQ.updateApproval(authValue,url,requestID,action)
+        res = MIQ.updateApproval(authValue,url,requestID,action)
         del tasks[requestID]
-        print(resp)
+    elif re.search("AWS list instances for ",inp):
+        res = ec2.getUserInstances(Config.aws_verbose,' '.join(inp.split(" ")[4:]))
+    elif re.search("AWS list instances",inp):
+        res = ""
+        resp = ec2.listInstances(Config.aws_verbose)
+        for k, v in resp.items():
+            res += k+":"+str(v)+"\n"
+        res += "Found "+str(len(resp.keys()))+" instances"
+    else:
+        if inp != "":
+            res = "Received: "+str(inp)
+    return res
 
 if __name__ == '__main__':
     print("Welcome")
@@ -105,6 +117,7 @@ if __name__ == '__main__':
     while not quitter:
         inp = input(">")
         if inp == "quit":
+            res = "Bye"
             quitter = True
             e.set()
             a.join()
@@ -112,7 +125,5 @@ if __name__ == '__main__':
             try:
                 res = eval(inp)
             except:
-                if inp != "":
-                    res="Received: "+str(inp)
+                res = analyse(inp)
         print(res)
-    print("Bye")
