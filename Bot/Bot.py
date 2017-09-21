@@ -86,6 +86,7 @@ def analyse(inp):
     """
     function to analyse user input and get the best answer
     """
+    res=""
     if re.search("^(a|d)[0-9]*$",inp):
         if inp[0] == "d":
             action = "deny"
