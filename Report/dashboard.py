@@ -31,6 +31,7 @@ def login():
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
+    session.pop('password', None)
     return redirect(url_for('index'))
 
 # set the secret key.  keep this really secret:
