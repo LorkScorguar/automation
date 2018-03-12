@@ -6,6 +6,7 @@ from login import login_page
 import DB
 
 app = Flask(__name__)
+app.config.from_pyfile('config.cfg')
 app.register_blueprint(login_page)
 
 @app.route('/')
@@ -91,3 +92,6 @@ def logout():
 
 # set the secret key.  keep this really secret:
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+_host=app.config['SERVERNAME']
+_port=app.config['PORT']
+app.run(_host,_port)
