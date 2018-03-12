@@ -6,11 +6,10 @@ app.register_blueprint(login_page)
 
 @app.route('/')
 def index():
-    """if 'username' in session:
-        return 'Logged in as %s' % escape(session['username'])
+    if 'username' in session:
+        return render_template('dashboard.html')
     else:
-        redirect(url_for('login_page.login'))"""
-    return render_template('dashboard.html')
+        return redirect(url_for('login_page.login'))
 
 @app.route('/logout')
 def logout():
