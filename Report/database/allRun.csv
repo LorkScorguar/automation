@@ -1,4 +1,4 @@
-#id,uuid,name,duration,status,user,message
+id,uuid,name,duration,status,user,message
 1,abcde,testFlow1,10.0,success,user1,vm provisioned
 2,fghij,testFlow2,10.0,success,user2,vip reserved
 3,abcde,testFlow1,12.3,success,user3,vm provisioned
