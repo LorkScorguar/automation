@@ -1,5 +1,6 @@
 from flask import Flask, session, redirect, render_template, url_for, escape, request
 from login import login_page
+import DB
 
 app = Flask(__name__)
 app.register_blueprint(login_page)
@@ -7,7 +8,8 @@ app.register_blueprint(login_page)
 @app.route('/')
 def index():
     if 'username' in session:
-        return render_template('dashboard.html')
+        data=DB.getAllRun()
+        return render_template('dashboard.html',data=data)
     else:
         return redirect(url_for('login_page.login'))
 
