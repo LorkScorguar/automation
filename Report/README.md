@@ -6,12 +6,10 @@ save them in DB
 One web app to show results using either table or graph
 
 We should provide:
-- top 10 users (table)
-- top 10 requested services (table)
-- top 10 users per Business Unit (dynamic table)
-- top 10 requested services per Business Unit (dynamic table)
-- top 10 errors (table)
-- number of requested services over time (graph)
-- error rate per services (table)
-- error rate per services over time (graph)
-- error rate for a service over time (dynamic graph)
+- yesterday_services: table of top requested services + graph service's number + error rate
+- last_month_errors: table of most frequents error + graph error rate per day
+- last_year_errors: table of most frequents error + graph error rate per month
+- last_month_users: table of top requesters + graph different user's number per day
+- last_year_users: table of top requesters + graph different user's number per month
+- last_month_services: table of most requested services + graph number requested services per day
+- last_year_services: table of most requested services + graph number requested services per month + graph average duration per service over months
