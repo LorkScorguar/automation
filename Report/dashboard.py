@@ -9,7 +9,7 @@ app.register_blueprint(login_page)
 def index():
     if 'username' in session:
         data=DB.getAllRun()
-        return render_template('dashboard.html',data=data)
+        return render_template('yesterday_main.html',data=data)
     else:
         return redirect(url_for('login_page.login'))
 
