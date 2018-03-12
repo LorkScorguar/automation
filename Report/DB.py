@@ -1,3 +1,4 @@
+import calendar
 import csv
 import datetime
 from collections import OrderedDict
@@ -56,17 +57,18 @@ def getLastYearUsers():
 def getLastMonthUsersPerDay():
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
+    prevmonth=datetime.datetime.today()+relativedelta(months=-1)
+    fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
+    for i in range(fd,ld):
+        allUsers[i]=0
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
-        prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if endDate.day in allUsers.keys():
                 allUsers[endDate.day]+=1
             else:
                 allUsers[endDate.day]=1
-    print(allUsers)
     allUsersOrdered=OrderedDict(sorted(allUsers.items(), key=lambda t: t[1], reverse=True))
-    print(allUsersOrdered)
     userPerDay=[]
     for k,v in allUsersOrdered.items():
         userPerDay.append(v)
