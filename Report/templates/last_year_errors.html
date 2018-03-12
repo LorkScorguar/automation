@@ -28,54 +28,45 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" href="{{ url_for('index') }}">
                   <span data-feather="home"></span>
                   Yesterday <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ url_for('last_month_users') }}">
                   <span data-feather="users"></span>
-                  Users
+                  Last Month Users
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ url_for('last_month_services') }}">
                   <span data-feather="shopping-cart"></span>
-                  Services
+                  Last Month Services
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ url_for('last_month_errors') }}">
                   <span data-feather="file"></span>
-                  Errors
-                </a>
-              </li>
-            </ul>
-
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-              <span>Saved reports</span>
-              <a class="d-flex align-items-center text-muted" href="#">
-                <span data-feather="plus-circle"></span>
-              </a>
-            </h6>
-            <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Current month
+                  Last Month Errors
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last month
+                <a class="nav-link" href="{{ url_for('last_year_users') }}">
+                  <span data-feather="users"></span>
+                  Last Year Users
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last Year
+                <a class="nav-link" href="{{ url_for('last_year_services') }}">
+                  <span data-feather="shopping-cart"></span>
+                  Last Year Services
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('last_year_errors') }}">
+                  <span data-feather="file"></span>
+                  Last Year Errors
                 </a>
               </li>
             </ul>
@@ -84,7 +75,7 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Yesterday</h1>
+            <h1 class="h2">Last Year Errors</h1>
           </div>
 
           <canvas class="my-4" id="myChart" width="900" height="380"></canvas>

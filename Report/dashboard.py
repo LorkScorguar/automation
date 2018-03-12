@@ -9,7 +9,55 @@ app.register_blueprint(login_page)
 def index():
     if 'username' in session:
         data=DB.getAllRun()
-        return render_template('yesterday_main.html',data=data)
+        return render_template('yesterday_services.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_month_users')
+def last_month_users():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_month_users.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_month_services')
+def last_month_services():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_month_services.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_month_errors')
+def last_month_errors():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_month_errors.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_year_users')
+def last_year_users():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_year_users.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_year_services')
+def last_year_services():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_year_services.html',data=data)
+    else:
+        return redirect(url_for('login_page.login'))
+
+@app.route('/last_year_errors')
+def last_year_errors():
+    if 'username' in session:
+        data=DB.getAllRun()
+        return render_template('last_year_errors.html',data=data)
     else:
         return redirect(url_for('login_page.login'))
 
