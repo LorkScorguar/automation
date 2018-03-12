@@ -34,7 +34,11 @@ def last_month_users():
 def last_month_services():
     if 'username' in session:
         data=DB.getLastMonthServices()
-        return render_template('last_month_services.html',data=data)
+        dataGraph=DB.getLastMonthServicesPerDay()
+        prevmonth=datetime.datetime.today()+relativedelta(months=-1)
+        fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
+        label=[]
+        return render_template('last_month_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
         return redirect(url_for('login_page.login'))
 
@@ -65,7 +69,8 @@ def last_year_users():
 def last_year_services():
     if 'username' in session:
         data=DB.getLastYearServices()
-        return render_template('last_year_services.html',data=data)
+        dataGraph=DB.getLastYearServicesPerMonth()
+        return render_template('last_year_services.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))
 

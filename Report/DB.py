@@ -64,10 +64,7 @@ def getLastMonthUsersPerDay():
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if endDate.day in allUsers.keys():
-                allUsers[endDate.day]+=1
-            else:
-                allUsers[endDate.day]=1
+            allUsers[endDate.day]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerDay=[]
     for k,v in allUsersOrdered.items():
@@ -81,10 +78,7 @@ def getLastYearUsersPerMonth():
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
-            if endDate.month in allUsers.keys():
-                allUsers[endDate.month]+=1
-            else:
-                allUsers[endDate.month]=1
+            allUsers[endDate.month]+=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerMonth=[]
     for k,v in allUsersOrdered.items():
@@ -94,25 +88,48 @@ def getLastYearUsersPerMonth():
 def getLastMonthServices():
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
+    prevmonth=datetime.datetime.today()+relativedelta(months=-1)
     for row in reader:
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
-        prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             duration=endDate-startDate
             allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
+def getLastMonthServicesPerDay():
+    allServices={}
+    reader=csv.DictReader((open("database/allRun.csv")))
+    prevmonth=datetime.datetime.today()+relativedelta(months=-1)
+    fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
+    for i in range(fd,ld):
+        allServices[i]=0
+    for row in reader:
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
+            allServices[endDate.day]+=1
+    return allServices
+
 def getLastYearServices():
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
+    prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
-        prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
             duration=endDate-startDate
             allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+    return allServices
+
+def getLastYearServicesPerMonth():
+    allServices={}
+    reader=csv.DictReader((open("database/allRun.csv")))
+    prevyear=datetime.datetime.today()+relativedelta(years=-1)
+    for row in reader:
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        if prevyear.year==endDate.year:
+            allServices[endDate.month]+=1
     return allServices
 
 def getLastMonthErrors():
