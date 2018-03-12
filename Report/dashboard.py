@@ -17,7 +17,8 @@ def index():
 def last_month_users():
     if 'username' in session:
         data=DB.getLastMonthUsers()
-        return render_template('last_month_users.html',data=data)
+        dataGraph=DB.getLastMonthUsersPerDay()
+        return render_template('last_month_users.html',data=data,dataGraph=dataGraph)
     else:
         return redirect(url_for('login_page.login'))
 
