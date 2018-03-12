@@ -1,5 +1,5 @@
 id,uuid,name,startDate,endDate,status,user,message
-1,abcde,testFlow1,2018-02-11 09:39:05.841980,2018-02-11 10:43:08.841980,10.0,success,user1,vm provisioned
-2,fghij,testFlow2,2018-03-08 10:39:05.841980,2018-03-08 10:42:01.841980,10.0,success,user2,vip reserved
-3,abcde,testFlow1,2018-03-10 11:39:05.841980,2018-03-12 12:44:07.841980,12.3,success,user3,vm provisioned
+1,abcde,testFlow1,2018-02-11 09:39:05.841980,2018-02-11 10:43:08.841980,success,user1,vm provisioned
+2,fghij,testFlow2,2018-03-08 10:39:05.841980,2018-03-08 10:42:01.841980,success,user2,vip reserved
+3,abcde,testFlow1,2018-03-10 11:39:05.841980,2018-03-12 12:44:07.841980,success,user3,vm provisioned
 4,klmno,testFlow3,2018-03-12 10:39:05.841980,2018-03-12 10:43:08.841980,error,user1,error getting IP
