@@ -124,7 +124,7 @@ def getLastMonthErrors():
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if row['message'] in allErrors.keys() and row['status']=='error':
                 allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
-            else:
+            elif row['status']=='error':
                 allErrors[row['message']]={"nb":1,"service":row['name']}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
@@ -138,7 +138,7 @@ def getLastYearErrors():
         if prevyear.year==endDate.year:
             if row['message'] in allErrors.keys() and row['status']=='error':
                 allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
-            else:
+            elif row['status']=='error':
                 allErrors[row['message']]={"nb":1,"service":row['name']}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
@@ -149,7 +149,7 @@ def getLastMonthErrorsRatePerDay():
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
     fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
     for i in range(fd,ld):
-        allErrors[i]=0
+        allErrors[i]={"nb":0,"total":0}
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
@@ -161,15 +161,16 @@ def getLastMonthErrorsRatePerDay():
     allErrorsOrdered=OrderedDict(sorted(allErrors.items()))
     errorPerDay=[]
     for k,v in allErrorsOrdered.items():
-        errorPerDay.append((v['nb']*100)/v['total'])
+        if v['total']>0:
+            errorPerDay.append((v['nb']*100)/v['total'])
+        else:
+            errorPerDay.append(0)
     return errorPerDay
 
 def getLastYearErrorsRatePerMonth():
-    allErrors={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
+    allErrors={1:{"nb":0,"total":0},2:{"nb":0,"total":0},3:{"nb":0,"total":0},4:{"nb":0,"total":0},5:{"nb":0,"total":0},6:{"nb":0,"total":0},7:{"nb":0,"total":0},8:{"nb":0,"total":0},9:{"nb":0,"total":0},10:{"nb":0,"total":0},11:{"nb":0,"total":0},12:{"nb":0,"total":0}}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
-    for i in range(fd,ld):
-        allErrors[i]=0
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevyear.year==endDate.year:
@@ -181,5 +182,8 @@ def getLastYearErrorsRatePerMonth():
     allErrorsOrdered=OrderedDict(sorted(allErrors.items()))
     errorPerMonth=[]
     for k,v in allErrorsOrdered.items():
-        errorPerMonth.append((v['nb']*100)/v['total'])
+        if v['total']>0:
+            errorPerMonth.append((v['nb']*100)/v['total'])
+        else:
+            errorPerMonth.append(0)
     return errorPerMonth
