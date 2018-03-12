@@ -106,7 +106,11 @@ def getLastMonthServicesPerDay():
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             allServices[endDate.day]+=1
-    return allServices
+    allServicesOrdered=OrderedDict(sorted(allServices.items()))
+    servicePerDay=[]
+    for k,v in allServicesOrdered.items():
+        servicePerDay.append(v)
+    return servicePerDay
 
 def getLastYearServices():
     allServices=OrderedDict()
@@ -118,7 +122,11 @@ def getLastYearServices():
         if prevyear.year==endDate.year:
             duration=endDate-startDate
             allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
-    return allServices
+    allServicesOrdered=OrderedDict(sorted(allServices.items()))
+    servicePerMonth=[]
+    for k,v in allServicesOrdered.items():
+        servicePerMonth.append(v)
+    return servicePerMonth
 
 def getLastYearServicesPerMonth():
     allServices={}
