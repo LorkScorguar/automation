@@ -64,7 +64,7 @@ def getLastMonthUsersPerDay():
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            allUsers[endDate.day]=1
+            allUsers[endDate.day]+=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerDay=[]
     for k,v in allUsersOrdered.items():
