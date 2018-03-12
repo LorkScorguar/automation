@@ -13,3 +13,12 @@ We should provide:
 - last_year_users: table of top requesters + graph different user's number per month
 - last_month_services: table of most requested services + graph number requested services per day
 - last_year_services: table of most requested services + graph number requested services per month + graph average duration per service over months
+
+We should have a config file:
+- authentication: true or false
+- ldap_host
+- ldap_port
+- ldap_user
+- ldap_password
+- listening port
+- listening address
