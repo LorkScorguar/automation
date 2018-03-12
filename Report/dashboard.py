@@ -1,3 +1,4 @@
+import calendar
 from flask import Flask, session, redirect, render_template, url_for, escape, request
 from login import login_page
 import DB
@@ -18,7 +19,11 @@ def last_month_users():
     if 'username' in session:
         data=DB.getLastMonthUsers()
         dataGraph=DB.getLastMonthUsersPerDay()
-        return render_template('last_month_users.html',data=data,dataGraph=dataGraph,graphLabel='')
+        fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
+        label=[]
+        for i in range(fd,ld):
+            label.append(i)
+        return render_template('last_month_users.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
         return redirect(url_for('login_page.login'))
 
@@ -43,7 +48,7 @@ def last_year_users():
     if 'username' in session:
         data=DB.getLastYearUsers()
         dataGraph=DB.getLastYearUsersPerMonth()
-        return render_template('last_year_users.html',data=data,dataGraph=dataGraph,graphLabel=['1','2','3','4','5','6','7','8','9','10','11','12'])
+        return render_template('last_year_users.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))
 
