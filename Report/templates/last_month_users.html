@@ -85,25 +85,15 @@
             <table id="data" class="table table-striped table-bordered" cellspacing="0" width="100%">
               <thead>
                 <tr>
-                  <th>#</th>
                   <th>Name</th>
-                  <th>Duration</th>
-                  <th>Status</th>
-                  <th>User</th>
+                  <th>Amounts</th>
                 </tr>
               </thead>
               <tbody>
                 {% for k,v in data.items() %}
-                {% if v['status']=='error' %}
-                  <tr class="table-danger">
-                {% else %}
-                  <tr>
-                {% endif %}
+                <tr>
                   <td>{{ k }}</td>
-                  <td>{{ v['name'] }}</td>
-                  <td>{{ v['duration'] }}</td>
-                  <td>{{ v['status'] }}</td>
-                  <td>{{ v['user'] }}</td>
+                  <td>{{ v }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
