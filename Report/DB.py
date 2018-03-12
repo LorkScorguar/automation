@@ -58,8 +58,7 @@ def getLastMonthUsersPerDay():
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
-    fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
-    for i in range(fd-1,ld+1):
+    for i in range(,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allUsers[i]=0
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
@@ -101,8 +100,7 @@ def getLastMonthServicesPerDay():
     allServices={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
-    fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
-    for i in range(fd-1,ld+1):
+    for i in range(,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allServices[i]=0
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
@@ -164,8 +162,7 @@ def getLastMonthErrorsRatePerDay():
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
-    fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
-    for i in range(fd,ld):
+    for i in range(,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allErrors[i]={"nb":0,"total":0}
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
