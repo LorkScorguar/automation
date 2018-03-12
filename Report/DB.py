@@ -153,7 +153,7 @@ def getLastMonthErrorsRatePerDay():
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if endDate.day in allErrors.keys()
+            if endDate.day in allErrors.keys():
                 if row['status']=='error':
                     allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb']+1,"total":allErrors[endDate.day]['total']+1}
                 else:
