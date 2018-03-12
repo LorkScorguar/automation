@@ -42,7 +42,13 @@ def last_month_services():
 def last_month_errors():
     if 'username' in session:
         data=DB.getLastMonthErrors()
-        return render_template('last_month_errors.html',data=data)
+        dataGraph=DB.getLastMonthErrorsRatePerDay()
+        prevmonth=datetime.datetime.today()+relativedelta(months=-1)
+        fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
+        label=[]
+        for i in range(fd,ld):
+            label.append(i)
+        return render_template('last_month_errors.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
         return redirect(url_for('login_page.login'))
 
@@ -67,7 +73,8 @@ def last_year_services():
 def last_year_errors():
     if 'username' in session:
         data=DB.getLastYearErrors()
-        return render_template('last_year_errors.html',data=data)
+        dataGraph=DB.getLastYearErrorsRatePerMonth()
+        return render_template('last_year_errors.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))
 
