@@ -73,7 +73,7 @@ def getLastMonthUsersPerDay():
     return userPerDay
 
 def getLastYearUsersPerMonth():
-    allUsers={}
+    allUsers={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
