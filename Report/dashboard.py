@@ -1,4 +1,5 @@
 import calendar
+from dateutil.relativedelta import relativedelta
 from flask import Flask, session, redirect, render_template, url_for, escape, request
 from login import login_page
 import DB
@@ -19,6 +20,7 @@ def last_month_users():
     if 'username' in session:
         data=DB.getLastMonthUsers()
         dataGraph=DB.getLastMonthUsersPerDay()
+        prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
         label=[]
         for i in range(fd,ld):
