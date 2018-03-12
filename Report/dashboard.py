@@ -10,7 +10,7 @@ def index():
         return 'Logged in as %s' % escape(session['username'])
     else:
         redirect(url_for('login_page.login'))"""
-    return render_template('template/dashboard.html')
+    return render_template('dashboard.html')
 
 @app.route('/logout')
 def logout():
