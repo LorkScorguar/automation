@@ -23,7 +23,7 @@ def last_month_users():
         dataGraph=DB.getLastMonthUsersPerDay()
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
-        for i in range(calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
+        for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
             label.append(i)
         return render_template('last_month_users.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
@@ -36,7 +36,7 @@ def last_month_services():
         dataGraph=DB.getLastMonthServicesPerDay()
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
-        for i in range(calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
+        for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
             label.append(i)
         return render_template('last_month_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
@@ -49,7 +49,7 @@ def last_month_errors():
         dataGraph=DB.getLastMonthErrorsRatePerDay()
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
-        for i in range(calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
+        for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
             label.append(i)
         return render_template('last_month_errors.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
