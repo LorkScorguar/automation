@@ -24,7 +24,7 @@ def last_month_users():
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
         label=[]
-        for i in range(fd,ld):
+        for i in range(fd-1,ld+1):
             label.append(i)
         return render_template('last_month_users.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
@@ -38,6 +38,8 @@ def last_month_services():
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
         label=[]
+        for i in range(fd-1,ld+1):
+            label.append(i)
         return render_template('last_month_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
         return redirect(url_for('login_page.login'))
@@ -50,7 +52,7 @@ def last_month_errors():
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         fd,ld=calendar.monthrange(prevmonth.year,prevmonth.month)
         label=[]
-        for i in range(fd,ld):
+        for i in range(fd-1,ld+1):
             label.append(i)
         return render_template('last_month_errors.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
