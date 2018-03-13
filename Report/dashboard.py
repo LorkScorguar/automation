@@ -61,7 +61,7 @@ def last_year_users():
     if 'username' in session:
         data=DB.getLastYearUsers(session['group'])
         dataGraph=DB.getLastYearUsersPerMonth(session['group'])
-        return render_template('last_year_users.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
+        return render_template('last_year_users.html',data=data,dataGraph=dataGraph,graphLabel=[1,2,3,4,5,6,7,8,9,10,11,12])
     else:
         return redirect(url_for('login_page.login'))
 
@@ -70,7 +70,7 @@ def last_year_services():
     if 'username' in session:
         data=DB.getLastYearServices(session['group'])
         dataGraph=DB.getLastYearServicesPerMonth(session['group'])
-        return render_template('last_year_services.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
+        return render_template('last_year_services.html',data=data,dataGraph=dataGraph,graphLabel=[1,2,3,4,5,6,7,8,9,10,11,12])
     else:
         return redirect(url_for('login_page.login'))
 
@@ -79,7 +79,7 @@ def last_year_errors():
     if 'username' in session:
         data=DB.getLastYearErrors(session['group'])
         dataGraph=DB.getLastYearErrorsRatePerMonth(session['group'])
-        return render_template('last_year_errors.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
+        return render_template('last_year_errors.html',data=data,dataGraph=dataGraph,graphLabel=[1,2,3,4,5,6,7,8,9,10,11,12])
     else:
         return redirect(url_for('login_page.login'))
 
