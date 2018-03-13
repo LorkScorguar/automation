@@ -12,7 +12,7 @@ We should provide:
 - last_month_users: table of top requesters + graph different user's number per day (done)
 - last_year_users: table of top requesters + graph different user's number per month (done)
 - last_month_services: table of most requested services + graph number requested services per day (done)
-- last_year_services: table of most requested services + graph number requested services per month + graph average duration per service over months
+- last_year_services: table of most requested services + graph number requested services per month (done)
 
 We should have a config file:
 - authentication: true or false
