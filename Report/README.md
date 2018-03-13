@@ -22,3 +22,15 @@ We should have a config file:
 - ldap_password
 - listening port
 - listening address
+
+
+## To Run
+Use sample data by removing \_sample in database filename
+Or Run one importer script to get real data
+
+```bash
+export FLASK_APP=dashboard.py
+flask run
+```
+
+You can customize app by changing config.cfg
