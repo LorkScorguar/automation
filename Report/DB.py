@@ -62,9 +62,6 @@ def getYesterdayServices(userGroup='admin'):
                 allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
-def getYesterdayTop5Services(userGroup='admin'):
-    return 'ok'
-
 def getYesterdayTop5ServicesLabel(userGroup='admin'):
     top5=[]
     allServices={}
@@ -81,16 +78,33 @@ def getYesterdayTop5ServicesLabel(userGroup='admin'):
                         allServices[row['name']]+=1
             else:
                 if row['name'] not in allServices.keys():
-                    allServices[row['name']]=1
+                    if row['status']=='error':
+                        allServices[row['name']]={'error':1,'success':0}
+                    else:
+                        allServices[row['name']]={'error':0,'success':1}
                 else:
-                    allServices[row['name']]+=1
-    allServicesOrdered=OrderedDict(sorted(allServices.items(), key=lambda t: t[1], reverse=True))
+                    if row['status']=='error':
+                        allServices[row['name']]['error']=allServices[row['name']]['error']+1
+                    else:
+                        allServices[row['name']]['success']=allServices[row['name']]['success']+1
+    allServicesOrdered=OrderedDict(sorted(allServices.items(), key=lambda t: t[1]['success'], reverse=True))
     i=0
     for k in allServicesOrdered.keys():
         if i<5:
             top5.append(k)
         else:
             break
+        i+=1
+    return top5,allServicesOrdered
+
+def getYesterdayTop5Services(allServices,userGroup='admin'):
+    top5={'success':[],'error':[]}
+    i=0
+    for k,v in allServices.items():
+        if i > 5:
+            break
+        top5['success'].append(v['success'])
+        top5['error'].append(v['error'])
         i+=1
     return top5
 
