@@ -57,9 +57,9 @@ def getYesterdayServices(userGroup=''):
             duration=endDate-startDate
             if userGroup!='admin':
                 if getUserGroup(row['user'])==userGroup:
-                    allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+                    allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
             else:
-                allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+                allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
 def getLastMonthUsers(userGroup=''):
