@@ -5,3 +5,5 @@ Bot/Config.py
 */__pycache__
 Report/importer/secret.py
 */*/__pycache__
+Report/database/allRun.csv
+Report/database/allUsers.csv
