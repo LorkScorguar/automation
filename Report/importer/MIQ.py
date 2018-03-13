@@ -72,7 +72,11 @@ def getRun(authValue,miqurl):
                 status="error"
             else:
                 status="success"
-            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(resource['message'])+"\n")
+            if resource['status']!="Ok":
+                message=re.sub(".*Message ","",resource['message'])
+            else:
+                message=resource['message']
+            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
     file.close()
     return 'ok'
 
