@@ -62,6 +62,10 @@ def getYesterdayServices(userGroup=''):
                 allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
+def getYesterdayTop5ServicesLabel():
+    top5=[]
+    return top5
+
 def getLastMonthUsers(userGroup=''):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))

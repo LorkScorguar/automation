@@ -13,7 +13,9 @@ app.register_blueprint(login_page)
 def index():
     if 'username' in session:
         data=DB.getYesterdayServices(session['group'])
-        return render_template('yesterday_services.html',data=data)
+        dataGraph=DB.getYesterdayTop5Services(session['group'])
+        label=DB.getYesterdayTop5ServicesLabel()
+        return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
         if config['AUTHENTICATION']:
             return redirect(url_for('login_page.login'))
@@ -22,6 +24,7 @@ def index():
             session['password'] = "admin"
             session['group'] = DB.getUserGroup(request.form['username'])
             session['logged_in'] = True
+            data=DB.getYesterdayServices(session['group'])
             return render_template('yesterday_services.html',data=data)
 
 @app.route('/last_month_users')
