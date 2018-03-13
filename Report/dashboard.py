@@ -17,7 +17,7 @@ def index():
         dataGraph=DB.getYesterdayTop5Services(allServices,session['group'])
         return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
     else:
-        if config['AUTHENTICATION']:
+        if app.config['AUTHENTICATION']:
             return redirect(url_for('login_page.login'))
         else:
             session['username'] = "admin"
