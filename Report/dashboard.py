@@ -12,7 +12,7 @@ app.register_blueprint(login_page)
 @app.route('/')
 def index():
     if 'username' in session:
-        data=DB.getYesterdayServices()
+        data=DB.getYesterdayServices(session['group'])
         return render_template('yesterday_services.html',data=data)
     else:
         return redirect(url_for('login_page.login'))
@@ -20,8 +20,8 @@ def index():
 @app.route('/last_month_users')
 def last_month_users():
     if 'username' in session:
-        data=DB.getLastMonthUsers()
-        dataGraph=DB.getLastMonthUsersPerDay()
+        data=DB.getLastMonthUsers(session['group'])
+        dataGraph=DB.getLastMonthUsersPerDay(session['group'])
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
         for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
@@ -33,8 +33,8 @@ def last_month_users():
 @app.route('/last_month_services')
 def last_month_services():
     if 'username' in session:
-        data=DB.getLastMonthServices()
-        dataGraph=DB.getLastMonthServicesPerDay()
+        data=DB.getLastMonthServices(session['group'])
+        dataGraph=DB.getLastMonthServicesPerDay(session['group'])
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
         for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
@@ -46,8 +46,8 @@ def last_month_services():
 @app.route('/last_month_errors')
 def last_month_errors():
     if 'username' in session:
-        data=DB.getLastMonthErrors()
-        dataGraph=DB.getLastMonthErrorsRatePerDay()
+        data=DB.getLastMonthErrors(session['group'])
+        dataGraph=DB.getLastMonthErrorsRatePerDay(session['group'])
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         label=[]
         for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
@@ -59,8 +59,8 @@ def last_month_errors():
 @app.route('/last_year_users')
 def last_year_users():
     if 'username' in session:
-        data=DB.getLastYearUsers()
-        dataGraph=DB.getLastYearUsersPerMonth()
+        data=DB.getLastYearUsers(session['group'])
+        dataGraph=DB.getLastYearUsersPerMonth(session['group'])
         return render_template('last_year_users.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))
@@ -68,8 +68,8 @@ def last_year_users():
 @app.route('/last_year_services')
 def last_year_services():
     if 'username' in session:
-        data=DB.getLastYearServices()
-        dataGraph=DB.getLastYearServicesPerMonth()
+        data=DB.getLastYearServices(session['group'])
+        dataGraph=DB.getLastYearServicesPerMonth(session['group'])
         return render_template('last_year_services.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))
@@ -77,8 +77,8 @@ def last_year_services():
 @app.route('/last_year_errors')
 def last_year_errors():
     if 'username' in session:
-        data=DB.getLastYearErrors()
-        dataGraph=DB.getLastYearErrorsRatePerMonth()
+        data=DB.getLastYearErrors(session['group'])
+        dataGraph=DB.getLastYearErrorsRatePerMonth(session['group'])
         return render_template('last_year_errors.html',data=data,dataGraph=dataGraph,graphLabel=['january','february','march','april','may','june','july','august','september','october','november','december'])
     else:
         return redirect(url_for('login_page.login'))

@@ -1,4 +1,5 @@
 user,group
+admin,admin
 user1,admin
-user2,admin
+user2,tester
 user3,tester
