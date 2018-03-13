@@ -49,10 +49,10 @@ def getAllRun(userGroup=''):
 def getYesterdayServices(userGroup=''):
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
+    yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
     for row in reader:
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
-        yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
         if yesterday.month==endDate.month and yesterday.year==endDate.year and yesterday.day==endDate.day:
             duration=endDate-startDate
             if userGroup!='admin':
@@ -62,8 +62,36 @@ def getYesterdayServices(userGroup=''):
                 allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
-def getYesterdayTop5ServicesLabel():
+def getYesterdayTop5Services(userGroup=''):
+    return 'ok'
+
+def getYesterdayTop5ServicesLabel(userGroup=''):
     top5=[]
+    allServices={}
+    reader=csv.DictReader((open("database/allRun.csv")))
+    yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
+    for row in reader:
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
+        if yesterday.month==endDate.month and yesterday.year==endDate.year and yesterday.day==endDate.day:
+            if userGroup!='admin':
+                if getUserGroup(row['user'])==userGroup:
+                    if row['name'] not in allServices.keys():
+                        allServices[row['name']]=1
+                    else:
+                        allServices[row['name']]+=1
+            else:
+                if row['name'] not in allServices.keys():
+                    allServices[row['name']]=1
+                else:
+                    allServices[row['name']]+=1
+    allServicesOrdered=OrderedDict(sorted(allServices.items(), key=lambda t: t[1], reverse=True))
+    i=0
+    for k in allServicesOrdered.keys():
+        if i<5:
+            top5.append(k)
+        else:
+            break
+        i+=1
     return top5
 
 def getLastMonthUsers(userGroup=''):

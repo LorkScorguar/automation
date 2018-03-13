@@ -25,7 +25,9 @@ def index():
             session['group'] = DB.getUserGroup(request.form['username'])
             session['logged_in'] = True
             data=DB.getYesterdayServices(session['group'])
-            return render_template('yesterday_services.html',data=data)
+            dataGraph=DB.getYesterdayTop5Services(session['group'])
+            label=DB.getYesterdayTop5ServicesLabel()
+            return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
 
 @app.route('/last_month_users')
 def last_month_users():
