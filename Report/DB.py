@@ -4,6 +4,34 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 
+def getAllUsers(userGroup=''):
+    allUsers=OrderedDict()
+    reader=csv.DictReader((open("database/allUsers.csv")))
+    for row in reader:
+        if userGroup!='':
+            if row['group']==userGroup:
+                allUsers[row['user']]=row['group']
+        else:
+            allUsers[row['user']]=row['group']
+    return allUsers
+
+def getAllGroups():
+    allGroups=[]
+    reader=csv.DictReader((open("database/allUsers.csv")))
+    for row in reader:
+        if row['group'] not in allGroups:
+            allGroups.append(row['group'])
+    return allGroups
+
+def getUserGroup(user):
+    group=""
+    reader=csv.DictReader((open("database/allUsers.csv")))
+    for row in reader:
+        if row['user']==user:
+            group=row['group']
+            break
+    return group
+
 def getAllRun(userGroup=''):
     allRun=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
