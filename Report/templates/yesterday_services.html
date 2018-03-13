@@ -137,20 +137,30 @@
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: {{ graphLabel }},
-          datasets: [{
+          labels: ["service1","service2","service3","service4","service5"],
+          datasets: [
+            {
+              data: [2, 4, 2, 1, 0],
+              label: "error",
+              backgroundColor: "rgba(225, 58, 55, 0.7)",
+            },
+            {
             data: [21, 15, 8, 5, 2],
+            label: "success",
+            backgroundColor: "rgba(55, 160, 225, 0.7)",
           },
-          {
-            data: [2, 4, 2, 1, 0],
-          }]
+          ]
         },
         options: {
           scales: {
             yAxes: [{
+              stacked: true,
               ticks: {
-                beginAtZero: false
+                beginAtZero: true
               }
+            }],
+            xAxes: [{
+              stacked: true,
             }]
           },
           legend: {
