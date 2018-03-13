@@ -33,4 +33,6 @@ export FLASK_APP=dashboard.py
 flask run
 ```
 
+You should be able to connect to http://127.0.0.1:5000 using admin/admin
+
 You can customize app by changing config.cfg
