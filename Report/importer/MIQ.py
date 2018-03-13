@@ -77,7 +77,11 @@ def getRun(authValue,miqurl):
                 message=re.sub(".*Message ","",resource['message'])
             else:
                 message=resource['message']
-            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
+            try:
+                name=resource['description'].split("[")[1].split("]")[0]
+            except:
+                name=resource['description']
+            file.write(str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
     file.close()
     return 'ok'
 
