@@ -109,23 +109,30 @@ def getLastMonthUsersPerDay(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
     for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
-        allUsers[i]=0
+        allUsers[i]={}
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
-                    allUsers[endDate.day]+=1
+                    if row['user'] in allUsers[endDate.day]:
+                        allUsers[endDate.day][row['user']]=allUsers[endDate.day][row['user']]+1
+                    else:
+                        allUsers[endDate.day][row['user']]=1
             else:
-                allUsers[endDate.day]+=1
+                if row['user'] in allUsers[endDate.day]:
+                    allUsers[endDate.day][row['user']]=allUsers[endDate.day][row['user']]+1
+                else:
+                    allUsers[endDate.day][row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerDay=[]
     for k,v in allUsersOrdered.items():
-        userPerDay.append(v)
+        nbUser=len(v.keys())
+        userPerDay.append(nbUser)
     return userPerDay
 
 def getLastYearUsersPerMonth(userGroup=''):
-    allUsers={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
+    allUsers={1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{},9:{},10:{},11:{},12:{}}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
@@ -133,13 +140,20 @@ def getLastYearUsersPerMonth(userGroup=''):
         if prevyear.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
-                    allUsers[endDate.month]+=1
+                    if row['user'] in allUsers[endDate.month]:
+                        allUsers[endDate.month][row['user']]=allUsers[endDate.month][row['user']]+1
+                    else:
+                        allUsers[endDate.month][row['user']]=1
             else:
-                allUsers[endDate.month]+=1
+                if row['user'] in allUsers[endDate.month]:
+                    allUsers[endDate.month][row['user']]=allUsers[endDate.month][row['user']]+1
+                else:
+                    allUsers[endDate.month][row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerMonth=[]
     for k,v in allUsersOrdered.items():
-        userPerMonth.append(v)
+        nbUser=len(v.keys())
+        userPerMonth.append(nbUser)
     return userPerMonth
 
 def getLastMonthServices(userGroup=''):
