@@ -135,7 +135,7 @@
     <script>
       var ctx = document.getElementById("myChart");
       var myChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
           datasets: [{
@@ -157,6 +157,10 @@
           },
           legend: {
             display: false,
+          },
+          title: {
+            display: true,
+            text: "Top 5 services with error rate",
           }
         }
       });
