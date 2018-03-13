@@ -80,12 +80,10 @@ def getYesterdayTop5ServicesLabel(userGroup='admin'):
                     else:
                         allServices[row['name']]+=1
             else:
-                print(row)
                 if row['name'] not in allServices.keys():
                     allServices[row['name']]=1
                 else:
                     allServices[row['name']]+=1
-    print(allServices)
     allServicesOrdered=OrderedDict(sorted(allServices.items(), key=lambda t: t[1], reverse=True))
     i=0
     for k in allServicesOrdered.keys():
