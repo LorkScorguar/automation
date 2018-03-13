@@ -207,7 +207,11 @@ def getLastYearServicesPerMonth(userGroup=''):
                     allServices[endDate.month]+=1
             else:
                 allServices[endDate.month]+=1
-    return allServices
+    allServicesOrdered=OrderedDict(sorted(allServices.items()))
+    servicePerMonth=[]
+    for k,v in allServicesOrdered.items():
+        servicePerMonth.append(v)
+    return servicePerMonth
 
 def getLastMonthErrors(userGroup=''):
     allErrors={}
