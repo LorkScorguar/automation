@@ -25,6 +25,7 @@ def getUsers(authValue,miqurl):
     nb=0
     vmid=0
     file=open(dbUser,"w")
+    file.write("user,group\n")
     while nb < total:
         req=urllib.request.Request(miqurl+"/users?expand=resources&attributes=id,name,userid,current_group&limit=100&offset="+str(nb))
         req.add_header("content-type", "application/json")
@@ -45,6 +46,7 @@ def getRun(authValue,miqurl):
     total=1
     nb=0
     file=open(dbRun,"w")
+    file.write("id,uuid,name,startDate,endDate,status,user,message\n")
     while nb < total:
         req=urllib.request.Request(miqurl+"/requests?expand=resources&attributes=stamped_on&limit=100&offset="+str(nb))
         req.add_header("content-type", "application/json")
