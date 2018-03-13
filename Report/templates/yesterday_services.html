@@ -137,16 +137,15 @@
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          //labels: ["service1","service2","service3","service4","service5"],
           labels: {{ graphLabel|tojson }},
           datasets: [
             {
-              data: {{ dataGraph['success'] }},
+              data: {{ dataGraph['error'] }},
               label: "error",
               backgroundColor: "rgba(225, 58, 55, 0.7)",
             },
             {
-            data: {{ dataGraph['error'] }},
+            data: {{ dataGraph['success'] }},
             label: "success",
             backgroundColor: "rgba(55, 160, 225, 0.7)",
           },
