@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <title>Reporting</title>
+  <meta charset="utf-8">
+  <html lang="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet" type="text/css" />
+  <script type=text/javascript src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+  <script type="text/javascript">
+  window.onload = function () {
+    if ({{ invalid|tojson }}) {
+      document.getElementById('invalid').style.display = 'block';
+    } else {
+      document.getElementById('invalid').style.display = 'none';
+    }
+  };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+        <div class="col-md-offset-5 col-md-3">
+            <div class="form-login">
+            <h4>Welcome to PyAR</h4>
+            <p id="invalid">Invalid credentials</p>
+            <form method="post">
+              <input type="text" name="username" class="form-control input-sm chat-input" placeholder="username" />
+              </br>
+              <input type="text" name="password" class="form-control input-sm chat-input" placeholder="password" />
+              </br>
+              <div class="wrapper">
+              <span class="group-btn">
+                  <input type=submit class="btn btn-primary btn-md" value="login">
+              </span>
+              </div>
+            </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
