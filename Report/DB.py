@@ -193,13 +193,10 @@ def getLastYearServices(userGroup=''):
             else:
                 allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     allServicesOrdered=OrderedDict(sorted(allServices.items()))
-    servicePerMonth=[]
-    for k,v in allServicesOrdered.items():
-        servicePerMonth.append(v)
-    return servicePerMonth
+    return allServicesOrdered
 
 def getLastYearServicesPerMonth(userGroup=''):
-    allServices={}
+    allServices={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
