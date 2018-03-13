@@ -80,7 +80,10 @@ def getRun(authValue,miqurl):
             try:
                 name=resource['description'].split("[")[1].split("]")[0]
             except:
-                name=resource['description']
+                if re.search('VM Reconfigure',resource['description']):
+                    name=resource['description'].split(" - ")[1].split(":")[0]
+                else:
+                    name=resource['description']
             file.write(str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
     file.close()
     return 'ok'
