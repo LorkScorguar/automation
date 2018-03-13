@@ -3,6 +3,7 @@ dbRun="../database/allRun.csv"
 dbUser="../database/allUsers.csv"
 
 import base64
+import datetime
 import json
 import ssl
 import urllib.request
@@ -40,7 +41,7 @@ def getUsers(authValue,miqurl):
     file.close()
     return 'ok'
 
-def getRun():
+def getRun(authValue,miqurl):
     total=1
     nb=0
     file=open(dbRun,"w")
@@ -61,7 +62,11 @@ def getRun():
             except:
                 stampeddate=startdate
             #id,uuid,name,startDate,endDate,status,user,message
-            file.write(str(resource['id'])+","+str(resource['source_id'])+","+str(resource['description'])+","+str(stampeddate)+","+str(enddate)+","+str(resource['status'])+","+str(resource['userid'])+","+str(resource['message'])+"\n")
+            if 'source_id' in resource.keys():
+                uuid=resource['source_id']
+            else:
+                uuid=0
+            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(resource['status'])+","+str(resource['userid'])+","+str(resource['message'])+"\n")
     file.close()
     return 'ok'
 
