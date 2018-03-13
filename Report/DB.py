@@ -4,7 +4,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 
-def getAllRun():
+def getAllRun(userGroup=''):
     allRun=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -14,7 +14,7 @@ def getAllRun():
         allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allRun
 
-def getYesterdayServices():
+def getYesterdayServices(userGroup=''):
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -26,7 +26,7 @@ def getYesterdayServices():
             allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
-def getLastMonthUsers():
+def getLastMonthUsers(userGroup=''):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
@@ -40,7 +40,7 @@ def getLastMonthUsers():
     allUsersOrdered=OrderedDict(sorted(allUsers.items(), key=lambda t: t[1], reverse=True))
     return allUsersOrdered
 
-def getLastYearUsers():
+def getLastYearUsers(userGroup=''):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -54,7 +54,7 @@ def getLastYearUsers():
     allUsersOrdered=OrderedDict(sorted(allUsers.items(), key=lambda t: t[1], reverse=True))
     return allUsersOrdered
 
-def getLastMonthUsersPerDay():
+def getLastMonthUsersPerDay(userGroup=''):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
@@ -70,7 +70,7 @@ def getLastMonthUsersPerDay():
         userPerDay.append(v)
     return userPerDay
 
-def getLastYearUsersPerMonth():
+def getLastYearUsersPerMonth(userGroup=''):
     allUsers={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -84,7 +84,7 @@ def getLastYearUsersPerMonth():
         userPerMonth.append(v)
     return userPerMonth
 
-def getLastMonthServices():
+def getLastMonthServices(userGroup=''):
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
@@ -96,7 +96,7 @@ def getLastMonthServices():
             allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
-def getLastMonthServicesPerDay():
+def getLastMonthServicesPerDay(userGroup=''):
     allServices={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
@@ -112,7 +112,7 @@ def getLastMonthServicesPerDay():
         servicePerDay.append(v)
     return servicePerDay
 
-def getLastYearServices():
+def getLastYearServices(userGroup=''):
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
@@ -128,7 +128,7 @@ def getLastYearServices():
         servicePerMonth.append(v)
     return servicePerMonth
 
-def getLastYearServicesPerMonth():
+def getLastYearServicesPerMonth(userGroup=''):
     allServices={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
@@ -138,7 +138,7 @@ def getLastYearServicesPerMonth():
             allServices[endDate.month]+=1
     return allServices
 
-def getLastMonthErrors():
+def getLastMonthErrors(userGroup=''):
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -152,7 +152,7 @@ def getLastMonthErrors():
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
 
-def getLastYearErrors():
+def getLastYearErrors(userGroup=''):
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
@@ -166,7 +166,7 @@ def getLastYearErrors():
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
 
-def getLastMonthErrorsRatePerDay():
+def getLastMonthErrorsRatePerDay(userGroup=''):
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
@@ -189,7 +189,7 @@ def getLastMonthErrorsRatePerDay():
             errorPerDay.append(0)
     return errorPerDay
 
-def getLastYearErrorsRatePerMonth():
+def getLastYearErrorsRatePerMonth(userGroup=''):
     allErrors={1:{"nb":0,"total":0},2:{"nb":0,"total":0},3:{"nb":0,"total":0},4:{"nb":0,"total":0},5:{"nb":0,"total":0},6:{"nb":0,"total":0},7:{"nb":0,"total":0},8:{"nb":0,"total":0},9:{"nb":0,"total":0},10:{"nb":0,"total":0},11:{"nb":0,"total":0},12:{"nb":0,"total":0}}
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
