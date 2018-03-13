@@ -4,3 +4,4 @@ AWS/index.json
 Bot/Config.py
 */__pycache__
 Report/importer/secret.py
+*/*/__pycache__
