@@ -5,6 +5,7 @@ dbUser="../database/allUsers.csv"
 import base64
 import datetime
 import json
+import re
 import ssl
 import urllib.request
 
