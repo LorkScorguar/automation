@@ -137,7 +137,8 @@
       var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ["service1","service2","service3","service4","service5"],
+          //labels: ["service1","service2","service3","service4","service5"],
+          labels: {{ graphLabel }},
           datasets: [
             {
               data: [2, 4, 2, 1, 0],
