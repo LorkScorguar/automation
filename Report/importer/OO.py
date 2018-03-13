@@ -24,6 +24,7 @@ def ignoreCertificate():
 def getUsers(authValue,oourl):
     file=open(dbUser,"w")
     file.write("user,group\n")
+    file.write("admin,admin\n")
     file.close()
     return 'ok'
 

@@ -27,6 +27,7 @@ def getUsers(authValue,miqurl):
     vmid=0
     file=open(dbUser,"w")
     file.write("user,group\n")
+    file.write("admin,admin\n")
     while nb < total:
         req=urllib.request.Request(miqurl+"/users?expand=resources&attributes=id,name,userid,current_group&limit=100&offset="+str(nb))
         req.add_header("content-type", "application/json")
