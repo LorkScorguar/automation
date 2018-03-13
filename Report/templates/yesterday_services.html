@@ -141,12 +141,12 @@
           labels: {{ graphLabel|tojson }},
           datasets: [
             {
-              data: [2],
+              data: {{ dataGraph['success'] }},
               label: "error",
               backgroundColor: "rgba(225, 58, 55, 0.7)",
             },
             {
-            data: [21],
+            data: {{ dataGraph['error'] }},
             label: "success",
             backgroundColor: "rgba(55, 160, 225, 0.7)",
           },
