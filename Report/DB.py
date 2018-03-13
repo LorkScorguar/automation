@@ -36,8 +36,8 @@ def getAllRun(userGroup=''):
     allRun=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         duration=endDate-startDate
         if userGroup!='admin':
             if getUserGroup(row['user'])==userGroup:
@@ -50,8 +50,8 @@ def getYesterdayServices(userGroup=''):
     allServices=OrderedDict()
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
         if yesterday.month==endDate.month and yesterday.year==endDate.year and yesterday.day==endDate.day:
             duration=endDate-startDate
@@ -67,7 +67,7 @@ def getLastMonthUsers(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
@@ -87,7 +87,7 @@ def getLastYearUsers(userGroup=''):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
             if userGroup!='admin':
@@ -111,7 +111,7 @@ def getLastMonthUsersPerDay(userGroup=''):
     for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allUsers[i]=0
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
@@ -128,7 +128,7 @@ def getLastYearUsersPerMonth(userGroup=''):
     allUsers={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
             if userGroup!='admin':
@@ -147,8 +147,8 @@ def getLastMonthServices(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevmonth=datetime.datetime.today()+relativedelta(months=-1)
     for row in reader:
-        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             duration=endDate-startDate
             if userGroup!='admin':
@@ -165,7 +165,7 @@ def getLastMonthServicesPerDay(userGroup=''):
     for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allServices[i]=0
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
@@ -183,8 +183,8 @@ def getLastYearServices(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
-        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S.%f')
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
             duration=endDate-startDate
             if userGroup!='admin':
@@ -200,7 +200,7 @@ def getLastYearServicesPerMonth(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
@@ -217,7 +217,7 @@ def getLastMonthErrors(userGroup=''):
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
@@ -238,7 +238,7 @@ def getLastYearErrors(userGroup=''):
     allErrors={}
     reader=csv.DictReader((open("database/allRun.csv")))
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
             if userGroup!='admin':
@@ -262,7 +262,7 @@ def getLastMonthErrorsRatePerDay(userGroup=''):
     for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allErrors[i]={"nb":0,"total":0}
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
@@ -291,7 +291,7 @@ def getLastYearErrorsRatePerMonth(userGroup=''):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
-        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S.%f')
+        endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
             if userGroup!='admin':
                 if userGroup==getUserGroup(row['user']):
