@@ -15,7 +15,14 @@ def index():
         data=DB.getYesterdayServices(session['group'])
         return render_template('yesterday_services.html',data=data)
     else:
-        return redirect(url_for('login_page.login'))
+        if config['AUTHENTICATION']:
+            return redirect(url_for('login_page.login'))
+        else:
+            session['username'] = "admin"
+            session['password'] = "admin"
+            session['group'] = DB.getUserGroup(request.form['username'])
+            session['logged_in'] = True
+            return render_template('yesterday_services.html',data=data)
 
 @app.route('/last_month_users')
 def last_month_users():
