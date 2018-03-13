@@ -7,12 +7,12 @@ One web app to show results using either table or graph
 
 We should provide:
 - yesterday_services: table of top requested services + graph number requested services + error rate
-- last_month_errors: table of most frequents error + graph error rate per day (done)
-- last_year_errors: table of most frequents error + graph error rate per month (done)
-- last_month_users: table of top requesters + graph different user's number per day (done)
-- last_year_users: table of top requesters + graph different user's number per month (done)
-- last_month_services: table of most requested services + graph number requested services per day (done)
-- last_year_services: table of most requested services + graph number requested services per month (done)
+- last_month_errors: table of most frequents error + graph error rate per day
+- last_year_errors: table of most frequents error + graph error rate per month
+- last_month_users: table of top requesters + graph different user's number per day
+- last_year_users: table of top requesters + graph different user's number per month
+- last_month_services: table of most requested services + graph number requested services per day
+- last_year_services: table of most requested services + graph number requested services per month
 
 We should have a config file:
 - authentication: true or false
@@ -36,3 +36,15 @@ flask run
 You should be able to connect to http://127.0.0.1:5000 using admin/admin
 
 You can customize app by changing config.cfg
+
+## ToDo
+### v1
+- ldap configuration
+- one page with average duration per service per month
+- beautify login page
+### v2
+- User can choose to view stats for all Business Unit or choose a BU
+- User can choose to view stats for all services or a specific one
+- User can favorite at most 4 graphs
+- Dashboard showing favorites user's graph
+- Available data for services's graph: error rate, average duration, number per day, top 5 most requested
