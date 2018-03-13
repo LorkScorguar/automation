@@ -68,7 +68,11 @@ def getRun(authValue,miqurl):
                 uuid=resource['source_id']
             else:
                 uuid=0
-            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(resource['status'])+","+str(resource['userid'])+","+str(resource['message'])+"\n")
+            if resource['status']=="Error":
+                status="error"
+            else:
+                status="success"
+            file.write(str(resource['id'])+","+str(uuid)+","+str(resource['description'])+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(resource['message'])+"\n")
     file.close()
     return 'ok'
 
