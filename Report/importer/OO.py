@@ -1,3 +1,3 @@
 #This script is used to create database from OO API
-dbRun=open("database/allRun.csv","w")
-dbUser=open("database/allUsers.csv","w")
+dbRun="database/allRun.csv"
+dbUser="database/allUsers.csv"
