@@ -1,4 +1,4 @@
-# Report
+# PyAR (Python Automation Reporting)
 Goal is to have a reporting tool for automate/orchestration products
 
 One scripts to get informations from various source, transform them and
