@@ -3,6 +3,7 @@ dbRun="../database/allRun.csv"
 dbUser="../database/allUsers.csv"
 
 import base64
+from collections import OrderedDict
 import datetime
 import json
 import re
@@ -11,9 +12,9 @@ import urllib.request
 
 import secret
 
-user,password=secret.getCLDev()
+user,password=secret.getCLProd()
 authValue="Basic "+base64.b64encode(bytes(user+":"+password,'utf-8')).decode('utf-8')
-miqurl=secret.getCLURLDEV()
+miqurl=secret.getCLURLProd()
 
 def ignoreCertificate():
     context = ssl.create_default_context()
@@ -44,7 +45,8 @@ def getUsers(authValue,miqurl):
     file.close()
     return 'ok'
 
-def getRun(authValue,miqurl):
+def getRunInit(authValue,miqurl):
+    allRuns={}
     total=1
     nb=0
     file=open(dbRun,"w")
@@ -85,9 +87,14 @@ def getRun(authValue,miqurl):
                     name=resource['description'].split(" - ")[1].split(":")[0]
                 else:
                     name=resource['description']
-            file.write(str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
+            allRuns[resource['id']]=str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n"
+            #file.write(str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
+    allRunsOrdered=OrderedDict(sorted(allRuns.items()))
+    for k,v in allRunsOrdered.items():
+        file.write(v)
     file.close()
     return 'ok'
 
 getUsers(authValue,miqurl)
-getRun(authValue,miqurl)
+getRunInit(authValue,miqurl)
+#getRunDayly(authValue,miqurl)
