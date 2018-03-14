@@ -108,6 +108,19 @@ def getYesterdayTop5Services(allServices,userGroup='admin'):
         i+=1
     return top5
 
+def getYesterdayTop5ServicesAverageDuration(data,userGroup='admin'):
+    allServices={}
+    for k,v in data.items():
+        if v['name'] not in allServices.keys() and v['status']=="success":
+            allServices[v['name']]={"sum":v['duration'],"nb":1}
+        elif v['status']=="success":
+            allServices[v['name']]={"sum":allServices[v['name']]['sum']+v['duration'],"nb":allServices[v['name']]['nb']+1}
+    top5Duration={}
+    i=0
+    for k,v in allServices.items():
+        top5Duration[k]=v['sum']/v['nb']
+    return top5Duration
+
 def getLastMonthUsers(userGroup='admin'):
     allUsers={}
     reader=csv.DictReader((open("database/allRun.csv")))

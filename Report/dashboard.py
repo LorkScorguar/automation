@@ -14,8 +14,9 @@ def index():
     if 'username' in session:
         data=DB.getYesterdayServices(session['group'])
         label,allServices=DB.getYesterdayTop5ServicesLabel(session['group'])
+        dataTable=DB.getYesterdayTop5ServicesAverageDuration(data,userGroup='admin')
         dataGraph=DB.getYesterdayTop5Services(allServices,session['group'])
-        return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
+        return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label,dataTable=dataTable)
     else:
         if app.config['AUTHENTICATION']:
             return redirect(url_for('login_page.login'))
@@ -26,8 +27,9 @@ def index():
             session['logged_in'] = True
             data=DB.getYesterdayServices(session['group'])
             label,allServices=DB.getYesterdayTop5ServicesLabel(session['group'])
+            dataTable=DB.getYesterdayTop5ServicesAverageDuration(data,userGroup='admin')
             dataGraph=DB.getYesterdayTop5Services(allServices,session['group'])
-            return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label)
+            return render_template('yesterday_services.html',data=data,dataGraph=dataGraph,graphLabel=label,dataTable=dataTable)
 
 @app.route('/last_month_users')
 def last_month_users():
