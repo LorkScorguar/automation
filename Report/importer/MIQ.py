@@ -88,7 +88,57 @@ def getRunInit(authValue,miqurl):
                 else:
                     name=resource['description']
             allRuns[resource['id']]=str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n"
-            #file.write(str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n")
+    allRunsOrdered=OrderedDict(sorted(allRuns.items()))
+    for k,v in allRunsOrdered.items():
+        file.write(v)
+    file.close()
+    return 'ok'
+
+def getRunDaily(authValue,miqurl):
+    allRuns={}
+    total=1
+    nb=0
+    yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
+    date=yesterday.strftime("%Y-%m-%d")+" 06:00:00"
+    file=open(dbRun,"a")
+    file.write("id,uuid,name,startDate,endDate,status,user,message\n")
+    while nb < total:
+        req=urllib.request.Request(miqurl+"/requests?expand=resources&attributes=stamped_on&limit=100&filter[]=created_on>'"+date+"'&offset="+str(nb))
+        req.add_header("content-type", "application/json")
+        req.add_header("Authorization", authValue)
+        context=ignoreCertificate()
+        resp=urllib.request.urlopen(req,context=context)
+        jResp=json.loads(resp.read().decode('utf-8'))
+        total=jResp['count']
+        nb=nb+jResp['subcount']
+        for resource in jResp['resources']:
+            startdate=datetime.datetime.strptime(resource['created_on'],'%Y-%m-%dT%H:%M:%SZ')
+            enddate=datetime.datetime.strptime(resource['updated_on'],'%Y-%m-%dT%H:%M:%SZ')
+            try:
+                stampeddate=datetime.datetime.strptime(resource['stamped_on'],'%Y-%m-%dT%H:%M:%S.%fZ')
+            except:
+                stampeddate=startdate
+            #id,uuid,name,startDate,endDate,status,user,message
+            if 'source_id' in resource.keys():
+                uuid=resource['source_id']
+            else:
+                uuid=0
+            if resource['status']=="Error":
+                status="error"
+            else:
+                status="success"
+            if resource['status']!="Ok":
+                message=re.sub(".*Message ","",resource['message'])
+            else:
+                message=resource['message']
+            try:
+                name=resource['description'].split("[")[1].split("]")[0]
+            except:
+                if re.search('VM Reconfigure',resource['description']):
+                    name=resource['description'].split(" - ")[1].split(":")[0]
+                else:
+                    name=resource['description']
+            allRuns[resource['id']]=str(resource['id'])+","+str(uuid)+","+str(name)+","+str(stampeddate.strftime('%Y-%m-%d %H:%M:%S'))+","+str(enddate)+","+str(status)+","+str(resource['userid'])+","+str(message)+"\n"
     allRunsOrdered=OrderedDict(sorted(allRuns.items()))
     for k,v in allRunsOrdered.items():
         file.write(v)
@@ -96,5 +146,5 @@ def getRunInit(authValue,miqurl):
     return 'ok'
 
 getUsers(authValue,miqurl)
-getRunInit(authValue,miqurl)
-#getRunDayly(authValue,miqurl)
+#getRunInit(authValue,miqurl)
+getRunDayly(authValue,miqurl)
