@@ -147,4 +147,4 @@ def getRunDaily(authValue,miqurl):
 
 getUsers(authValue,miqurl)
 #getRunInit(authValue,miqurl)
-getRunDayly(authValue,miqurl)
+getRunDaily(authValue,miqurl)
