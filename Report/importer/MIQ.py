@@ -9,6 +9,7 @@ import json
 import re
 import ssl
 import urllib.request
+import urllib.parse
 
 import secret
 
@@ -101,9 +102,11 @@ def getRunDaily(authValue,miqurl):
     yesterday=datetime.datetime.today()-datetime.timedelta(days=1)
     date=yesterday.strftime("%Y-%m-%d")+" 06:00:00"
     file=open(dbRun,"a")
-    file.write("id,uuid,name,startDate,endDate,status,user,message\n")
+    #file.write("id,uuid,name,startDate,endDate,status,user,message\n")
+    param={"expand":"resources","attributes":"stamped_on","limit":100,"filter[]":"created_on>'"+date+"'","offset":nb}
+    paramEncoded=urllib.parse.urlencode(param)
     while nb < total:
-        req=urllib.request.Request(miqurl+"/requests?expand=resources&attributes=stamped_on&limit=100&filter[]=created_on>'"+date+"'&offset="+str(nb))
+        req=urllib.request.Request(miqurl+"/requests?"+paramEncoded)
         req.add_header("content-type", "application/json")
         req.add_header("Authorization", authValue)
         context=ignoreCertificate()
