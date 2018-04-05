@@ -229,7 +229,7 @@ def getLastMonthServices(userGroup='admin'):
     for row in reader:
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
-        if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
+        if prevmonth.month==endDate.month and prevmonth.year==endDate.year and prevmonth.month==startDate.month and prevmonth.year==startDate.year:
             duration=endDate-startDate
             if row['user']!="admin":
                 if userGroup!='admin':
@@ -246,8 +246,9 @@ def getLastMonthServicesPerDay(userGroup='admin'):
     for i in range(1,calendar.monthrange(prevmonth.year,prevmonth.month)[1]+1):
         allServices[i]=0
     for row in reader:
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
-        if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
+        if prevmonth.month==endDate.month and prevmonth.year==endDate.year and prevmonth.month==startDate.month and prevmonth.year==startDate.year:
             if row['user']!="admin":
                 if userGroup!='admin':
                     if userGroup==getUserGroup(row['user']):
@@ -267,7 +268,7 @@ def getLastYearServices(userGroup='admin'):
     for row in reader:
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
-        if prevyear.year==endDate.year:
+        if prevyear.year==endDate.year and prevyear.year==startDate.year:
             duration=endDate-startDate
             if row['user']!="admin":
                 if userGroup!='admin':
@@ -283,8 +284,9 @@ def getLastYearServicesPerMonth(userGroup='admin'):
     reader=csv.DictReader((open("database/allRun.csv")))
     prevyear=datetime.datetime.today()+relativedelta(years=-1)
     for row in reader:
+        startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
-        if prevyear.year==endDate.year:
+        if prevyear.year==endDate.year and prevyear.year==startDate.year:
             if row['user']!="admin":
                 if userGroup!='admin':
                     if userGroup==getUserGroup(row['user']):
