@@ -39,11 +39,12 @@ def getAllRun(userGroup='admin'):
         startDate=datetime.datetime.strptime(row['startDate'],'%Y-%m-%d %H:%M:%S')
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         duration=endDate-startDate
-        if userGroup!='admin':
-            if getUserGroup(row['user'])==userGroup:
+        if row['user']!="admin":
+            if userGroup!='admin':
+                if getUserGroup(row['user'])==userGroup:
+                    allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+            else:
                 allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
-        else:
-            allRun[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allRun
 
 def getYesterdayServices(userGroup='admin'):
@@ -55,11 +56,12 @@ def getYesterdayServices(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if yesterday.month==endDate.month and yesterday.year==endDate.year and yesterday.day==endDate.day:
             duration=endDate-startDate
-            if userGroup!='admin':
-                if getUserGroup(row['user'])==userGroup:
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if getUserGroup(row['user'])==userGroup:
+                        allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+                else:
                     allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
-            else:
-                allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
 def getYesterdayTop5ServicesLabel(userGroup='admin'):
@@ -70,23 +72,24 @@ def getYesterdayTop5ServicesLabel(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if yesterday.month==endDate.month and yesterday.year==endDate.year and yesterday.day==endDate.day:
-            if userGroup!='admin':
-                if getUserGroup(row['user'])==userGroup:
-                    if row['name'] not in allServices.keys():
-                        allServices[row['name']]=1
-                    else:
-                        allServices[row['name']]+=1
-            else:
-                if row['name'] not in allServices.keys():
-                    if row['status']=='error':
-                        allServices[row['name']]={'error':1,'success':0}
-                    else:
-                        allServices[row['name']]={'error':0,'success':1}
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if getUserGroup(row['user'])==userGroup:
+                        if row['name'] not in allServices.keys():
+                            allServices[row['name']]=1
+                        else:
+                            allServices[row['name']]+=1
                 else:
-                    if row['status']=='error':
-                        allServices[row['name']]['error']=allServices[row['name']]['error']+1
+                    if row['name'] not in allServices.keys():
+                        if row['status']=='error':
+                            allServices[row['name']]={'error':1,'success':0}
+                        else:
+                            allServices[row['name']]={'error':0,'success':1}
                     else:
-                        allServices[row['name']]['success']=allServices[row['name']]['success']+1
+                        if row['status']=='error':
+                            allServices[row['name']]['error']=allServices[row['name']]['error']+1
+                        else:
+                            allServices[row['name']]['success']=allServices[row['name']]['success']+1
     allServicesOrdered=OrderedDict(sorted(allServices.items(), key=lambda t: t[1]['success'], reverse=True))
     i=0
     for k in allServicesOrdered.keys():
@@ -128,17 +131,18 @@ def getLastMonthUsers(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['user'] in allUsers.keys():
+                            allUsers[row['user']]+=1
+                        else:
+                            allUsers[row['user']]=1
+                else:
                     if row['user'] in allUsers.keys():
                         allUsers[row['user']]+=1
                     else:
                         allUsers[row['user']]=1
-            else:
-                if row['user'] in allUsers.keys():
-                    allUsers[row['user']]+=1
-                else:
-                    allUsers[row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items(), key=lambda t: t[1], reverse=True))
     return allUsersOrdered
 
@@ -149,17 +153,18 @@ def getLastYearUsers(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['user'] in allUsers.keys():
+                            allUsers[row['user']]+=1
+                        else:
+                            allUsers[row['user']]=1
+                else:
                     if row['user'] in allUsers.keys():
                         allUsers[row['user']]+=1
                     else:
                         allUsers[row['user']]=1
-            else:
-                if row['user'] in allUsers.keys():
-                    allUsers[row['user']]+=1
-                else:
-                    allUsers[row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items(), key=lambda t: t[1], reverse=True))
     return allUsersOrdered
 
@@ -172,17 +177,18 @@ def getLastMonthUsersPerDay(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['user'] in allUsers[endDate.day]:
+                            allUsers[endDate.day][row['user']]=allUsers[endDate.day][row['user']]+1
+                        else:
+                            allUsers[endDate.day][row['user']]=1
+                else:
                     if row['user'] in allUsers[endDate.day]:
                         allUsers[endDate.day][row['user']]=allUsers[endDate.day][row['user']]+1
                     else:
                         allUsers[endDate.day][row['user']]=1
-            else:
-                if row['user'] in allUsers[endDate.day]:
-                    allUsers[endDate.day][row['user']]=allUsers[endDate.day][row['user']]+1
-                else:
-                    allUsers[endDate.day][row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerDay=[]
     for k,v in allUsersOrdered.items():
@@ -197,17 +203,18 @@ def getLastYearUsersPerMonth(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['user'] in allUsers[endDate.month]:
+                            allUsers[endDate.month][row['user']]=allUsers[endDate.month][row['user']]+1
+                        else:
+                            allUsers[endDate.month][row['user']]=1
+                else:
                     if row['user'] in allUsers[endDate.month]:
                         allUsers[endDate.month][row['user']]=allUsers[endDate.month][row['user']]+1
                     else:
                         allUsers[endDate.month][row['user']]=1
-            else:
-                if row['user'] in allUsers[endDate.month]:
-                    allUsers[endDate.month][row['user']]=allUsers[endDate.month][row['user']]+1
-                else:
-                    allUsers[endDate.month][row['user']]=1
     allUsersOrdered=OrderedDict(sorted(allUsers.items()))
     userPerMonth=[]
     for k,v in allUsersOrdered.items():
@@ -224,11 +231,12 @@ def getLastMonthServices(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
             duration=endDate-startDate
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+                else:
                     allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
-            else:
-                allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     return allServices
 
 def getLastMonthServicesPerDay(userGroup='admin'):
@@ -240,11 +248,12 @@ def getLastMonthServicesPerDay(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        allServices[endDate.day]+=1
+                else:
                     allServices[endDate.day]+=1
-            else:
-                allServices[endDate.day]+=1
     allServicesOrdered=OrderedDict(sorted(allServices.items()))
     servicePerDay=[]
     for k,v in allServicesOrdered.items():
@@ -260,11 +269,12 @@ def getLastYearServices(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
             duration=endDate-startDate
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
-                        allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
-            else:
-                allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                            allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
+                else:
+                    allServices[row['id']]={"uuid":row['uuid'],"name":row['name'],"duration":duration,"status":row['status'],"user":row['user'],"message":row['message']}
     allServicesOrdered=OrderedDict(sorted(allServices.items()))
     return allServicesOrdered
 
@@ -275,11 +285,12 @@ def getLastYearServicesPerMonth(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        allServices[endDate.month]+=1
+                else:
                     allServices[endDate.month]+=1
-            else:
-                allServices[endDate.month]+=1
     allServicesOrdered=OrderedDict(sorted(allServices.items()))
     servicePerMonth=[]
     for k,v in allServicesOrdered.items():
@@ -293,17 +304,18 @@ def getLastMonthErrors(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevmonth=datetime.datetime.today()+relativedelta(months=-1)
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['message'] in allErrors.keys() and row['status']=='error':
+                            allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
+                        elif row['status']=='error':
+                            allErrors[row['message']]={"nb":1,"service":row['name']}
+                else:
                     if row['message'] in allErrors.keys() and row['status']=='error':
                         allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
                     elif row['status']=='error':
                         allErrors[row['message']]={"nb":1,"service":row['name']}
-            else:
-                if row['message'] in allErrors.keys() and row['status']=='error':
-                    allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
-                elif row['status']=='error':
-                    allErrors[row['message']]={"nb":1,"service":row['name']}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
 
@@ -314,17 +326,18 @@ def getLastYearErrors(userGroup='admin'):
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         prevyear=datetime.datetime.today()+relativedelta(years=-1)
         if prevyear.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if row['message'] in allErrors.keys() and row['status']=='error':
+                            allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
+                        elif row['status']=='error':
+                            allErrors[row['message']]={"nb":1,"service":row['name']}
+                else:
                     if row['message'] in allErrors.keys() and row['status']=='error':
                         allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
                     elif row['status']=='error':
                         allErrors[row['message']]={"nb":1,"service":row['name']}
-            else:
-                if row['message'] in allErrors.keys() and row['status']=='error':
-                    allErrors[row['message']]={"nb":allErrors[row['message']]['nb']+1,"service":row['name']}
-                elif row['status']=='error':
-                    allErrors[row['message']]={"nb":1,"service":row['name']}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items(), key=lambda t: t[1]['nb'], reverse=True))
     return allErrorsOrdered
 
@@ -337,19 +350,20 @@ def getLastMonthErrorsRatePerDay(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevmonth.month==endDate.month and prevmonth.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if endDate.day in allErrors.keys():
+                            if row['status']=='error':
+                                allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb']+1,"total":allErrors[endDate.day]['total']+1}
+                            else:
+                                allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb'],"total":allErrors[endDate.day]['total']+1}
+                else:
                     if endDate.day in allErrors.keys():
                         if row['status']=='error':
                             allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb']+1,"total":allErrors[endDate.day]['total']+1}
                         else:
                             allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb'],"total":allErrors[endDate.day]['total']+1}
-            else:
-                if endDate.day in allErrors.keys():
-                    if row['status']=='error':
-                        allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb']+1,"total":allErrors[endDate.day]['total']+1}
-                    else:
-                        allErrors[endDate.day]={"nb":allErrors[endDate.day]['nb'],"total":allErrors[endDate.day]['total']+1}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items()))
     errorPerDay=[]
     for k,v in allErrorsOrdered.items():
@@ -366,19 +380,20 @@ def getLastYearErrorsRatePerMonth(userGroup='admin'):
     for row in reader:
         endDate=datetime.datetime.strptime(row['endDate'],'%Y-%m-%d %H:%M:%S')
         if prevyear.year==endDate.year:
-            if userGroup!='admin':
-                if userGroup==getUserGroup(row['user']):
+            if row['user']!="admin":
+                if userGroup!='admin':
+                    if userGroup==getUserGroup(row['user']):
+                        if endDate.month in allErrors.keys():
+                            if row['status']=='error':
+                                allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb']+1,"total":allErrors[endDate.month]['total']+1}
+                            else:
+                                allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb'],"total":allErrors[endDate.month]['total']+1}
+                else:
                     if endDate.month in allErrors.keys():
                         if row['status']=='error':
                             allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb']+1,"total":allErrors[endDate.month]['total']+1}
                         else:
                             allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb'],"total":allErrors[endDate.month]['total']+1}
-            else:
-                if endDate.month in allErrors.keys():
-                    if row['status']=='error':
-                        allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb']+1,"total":allErrors[endDate.month]['total']+1}
-                    else:
-                        allErrors[endDate.month]={"nb":allErrors[endDate.month]['nb'],"total":allErrors[endDate.month]['total']+1}
     allErrorsOrdered=OrderedDict(sorted(allErrors.items()))
     errorPerMonth=[]
     for k,v in allErrorsOrdered.items():
